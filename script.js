@@ -127,7 +127,7 @@ function setupCookies() {
 }
 
 function setupTheme() {
-  const saved = storage.get("mdb_theme") || "white";
+  const saved = storage.get("mdb_theme") || "black";
   setTheme(saved);
 
   document.getElementById("themeButton").addEventListener("click", () => {
