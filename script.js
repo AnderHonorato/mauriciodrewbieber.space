@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderPreviewCards();
   setupPreviewCarousel();
   setupModal();
-  setupShareButtons();
+  setupShareModal();
   setupWhatsAssistant();
   document.getElementById("year").textContent = new Date().getFullYear();
 });
@@ -118,11 +118,13 @@ function setupCookies() {
   accept.addEventListener("click", () => {
     localStorage.setItem("mdb_cookie_consent", "accepted");
     banner.classList.remove("is-visible");
+    showToast("Preferências salvas!");
   });
 
   reject.addEventListener("click", () => {
     sessionStorage.setItem("mdb_cookie_consent", "rejected");
     banner.classList.remove("is-visible");
+    showToast("Cookies recusados");
   });
 }
 
@@ -272,7 +274,11 @@ function setupModal() {
     modal.classList.add("is-unlocked");
   });
 
-  document.getElementById("modalShare").addEventListener("click", () => sharePage(PREVIEWS[modalIndex].title));
+  document.getElementById("modalShare").addEventListener("click", () => {
+    document.getElementById("shareUrlInput").value = window.location.href;
+    document.getElementById("shareModal").classList.add("is-open");
+    document.getElementById("shareModal").setAttribute("aria-hidden", "false");
+  });
 }
 
 function openModal(index) {
@@ -302,25 +308,55 @@ function closeModal() {
   document.body.style.overflow = "";
 }
 
-function setupShareButtons() {
-  document.getElementById("sharePage").addEventListener("click", () => sharePage("Mauricio Drew Bieber"));
-}
+function setupShareModal() {
+  const modal = document.getElementById("shareModal");
+  const input = document.getElementById("shareUrlInput");
+  const copyBtn = document.getElementById("shareCopyBtn");
+  const grid = document.getElementById("shareLinksGrid");
 
-async function sharePage(title) {
-  const data = {
-    title,
-    text: "Veja a página oficial do Mauricio Drew Bieber.",
-    url: window.location.href
-  };
+  const socialLinks = [
+    { label: "Privacy", url: APP.privacy },
+    { label: "Instagram", url: APP.instagram },
+    { label: "X / Twitter", url: APP.x },
+    { label: "WhatsApp", url: `https://wa.me/${APP.whatsapp}` }
+  ];
 
-  try {
-    if (navigator.share) {
-      await navigator.share(data);
-    } else {
+  grid.innerHTML = socialLinks.map(link => `
+    <a href="${link.url}" target="_blank" rel="noopener">${link.label}</a>
+  `).join("");
+
+  document.getElementById("sharePage").addEventListener("click", () => {
+    input.value = window.location.href;
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  });
+
+  document.querySelectorAll("[data-close-share]").forEach(el => {
+    el.addEventListener("click", () => {
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    });
+  });
+
+  copyBtn.addEventListener("click", async () => {
+    try {
       await navigator.clipboard.writeText(window.location.href);
-      alert("Link copiado.");
+      showToast("Link copiado! ✓");
+    } catch (_) {
+      input.select();
+      showToast("Selecione e copie o link acima");
     }
-  } catch (_) {}
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && modal.classList.contains("is-open")) {
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+  });
 }
 
 function setupWhatsAssistant() {
@@ -368,7 +404,17 @@ function whatsLink(context) {
   return `https://wa.me/${APP.whatsapp}?text=${encodeURIComponent(msg)}`;
 }
 
-function escapeHtml(value) {
+function showToast(message) {
+  const container = document.getElementById("toastContainer");
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    if (toast.parentNode) toast.remove();
+  }, 2600);
+}
   return String(value).replace(/[&<>"']/g, char => ({
     "&": "&amp;",
     "<": "&lt;",

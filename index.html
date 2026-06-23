@@ -208,6 +208,25 @@
     </article>
   </div>
 
+  <div class="modal" id="shareModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-share></div>
+
+    <div class="share-box" role="dialog" aria-modal="true" aria-label="Compartilhar">
+      <button class="modal-close" type="button" data-close-share aria-label="Fechar">×</button>
+      <strong>Compartilhar</strong>
+      <p>Escolha como quer compartilhar ou siga nas redes.</p>
+
+      <div class="share-links-grid" id="shareLinksGrid"></div>
+
+      <div class="share-copy-row">
+        <input id="shareUrlInput" type="text" readonly value="" aria-label="Link do site" />
+        <button id="shareCopyBtn" type="button">Copiar link</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
   <div class="cookie-banner" id="cookieBanner" role="dialog" aria-live="polite" aria-label="Preferências de cookies">
     <div>
       <strong>Cookies e preferências</strong>
