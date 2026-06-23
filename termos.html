@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="black">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Termos de Uso — Mauricio Drew Bieber</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    :root{
+      --font:"Lexend",system-ui,-apple-system,sans-serif;
+      --display:"Playfair Display",Georgia,serif;
+      --ease:cubic-bezier(.2,.8,.2,1);
+    }
+    html[data-theme="black"]{
+      color-scheme:dark;
+      --bg:#060606;--panel:#111;--panel2:#1a1a1a;--panel3:#292929;
+      --ink:#f7f2ea;--muted:#c0b4aa;--soft:#80766d;
+      --line:rgba(247,242,234,.13);--line2:rgba(247,242,234,.28);
+      --accent:#d39a7d;--red:#e07573;--red2:#3a2322;
+    }
+    html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--red) var(--panel2)}
+    ::-webkit-scrollbar{width:8px}
+    ::-webkit-scrollbar-track{background:var(--panel2)}
+    ::-webkit-scrollbar-thumb{background:linear-gradient(to bottom,var(--red),var(--accent));border-radius:999px;border:2px solid var(--panel2)}
+
+    body{
+      margin:0;min-height:100vh;
+      font-family:var(--font);color:var(--ink);background:var(--bg);
+      -webkit-font-smoothing:antialiased;
+    }
+
+    .topbar{
+      position:sticky;top:0;z-index:100;
+      background:rgba(6,6,6,.88);backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--line);
+      padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;
+      height:56px;
+    }
+    .topbar a{
+      display:flex;align-items:center;gap:8px;color:var(--ink);text-decoration:none;
+      font-family:var(--display);font-size:1rem;font-weight:700;
+    }
+    .topbar .dot{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+    .topbar .ver{font-size:.62rem;color:var(--soft);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+
+    .hero{
+      padding:4rem 1.5rem 2rem;max-width:700px;margin:0 auto;text-align:center;
+    }
+    .hero span{font-size:.68rem;color:var(--red);letter-spacing:.12em;text-transform:uppercase;font-weight:800}
+    .hero h1{font-family:var(--display);font-size:clamp(2rem,6vw,3.4rem);letter-spacing:-.04em;line-height:1.05;margin:.8rem 0}
+    .hero h1 em{color:var(--red);font-style:italic}
+    .hero p{color:var(--muted);font-size:.88rem;line-height:1.6;max-width:500px;margin:0 auto}
+
+    .tabs-wrap{
+      position:sticky;top:56px;z-index:90;
+      background:rgba(6,6,6,.85);backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line);
+      overflow-x:auto;scrollbar-width:none;
+    }
+    .tabs-wrap::-webkit-scrollbar{display:none}
+    .tabs{
+      display:flex;gap:2px;padding:0 1.5rem;max-width:900px;margin:0 auto;min-width:max-content;
+    }
+    .tab-btn{
+      display:flex;align-items:center;gap:6px;padding:0 14px;height:44px;
+      background:none;border:none;cursor:pointer;
+      font-family:var(--font);font-size:.74rem;font-weight:600;color:var(--soft);white-space:nowrap;
+      border-bottom:2px solid transparent;transition:all .2s;
+    }
+    .tab-btn:hover{color:var(--ink)}
+    .tab-btn.active{color:var(--red);border-bottom-color:var(--red)}
+
+    .layout{display:grid;grid-template-columns:200px 1fr;max-width:900px;margin:0 auto;min-height:100vh}
+    .sidebar{border-right:1px solid var(--line);padding:1.5rem 1rem;position:sticky;top:100px;height:calc(100vh - 100px);overflow-y:auto}
+    .sidebar-label{font-size:.58rem;color:var(--soft);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;font-weight:800}
+    .sidebar a{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;font-size:.74rem;color:var(--muted);text-decoration:none;cursor:pointer;transition:all .15s}
+    .sidebar a:hover{background:var(--panel2);color:var(--ink)}
+    .sidebar a.active{background:var(--red2);color:var(--red);font-weight:600}
+    .sidebar a .num{font-size:.6rem;color:var(--soft);min-width:20px}
+
+    .content{padding:2rem 2.5rem 4rem;min-width:0}
+    .panel{display:none;animation:fadeIn .25s ease}
+    .panel.active{display:block}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+    .section{margin-bottom:2.5rem;scroll-margin-top:110px}
+    .section-title{font-family:var(--display);font-size:1.2rem;margin-bottom:.8rem;display:flex;align-items:center;gap:8px}
+    .section-title .num{font-size:.65rem;color:var(--red);font-weight:700}
+    .section p{font-size:.82rem;line-height:1.7;color:var(--muted);margin:0 0 .8rem}
+    .section p strong{color:var(--ink)}
+
+    ul{list-style:none;padding:0;display:flex;flex-direction:column;gap:5px;margin:.8rem 0}
+    ul li{font-size:.8rem;line-height:1.6;color:var(--muted);padding:7px 10px 7px 28px;background:var(--panel2);border-radius:8px;border:1px solid var(--line);position:relative}
+    ul li::before{content:'→';position:absolute;left:10px;top:8px;color:var(--red);font-size:.7rem;font-weight:900}
+    ul.check li::before{content:'✓';color:#4cdf6e}
+    ul.cross li::before{content:'✕';color:#e07573}
+    ul li strong{color:var(--ink)}
+
+    .callout{padding:.9rem 1.1rem;border-radius:10px;border-left:3px solid;margin:1rem 0;font-size:.8rem;line-height:1.6}
+    .callout.info{background:rgba(59,130,246,.08);border-color:#3b82f6;color:#93c5fd}
+    .callout.warn{background:rgba(245,158,11,.08);border-color:#f59e0b;color:#fbbf24}
+    .callout.danger{background:rgba(239,68,68,.08);border-color:#ef4444;color:#fca5a5}
+
+    .table{width:100%;border-collapse:collapse;font-size:.76rem;margin:1rem 0}
+    .table th{font-size:.62rem;font-weight:600;color:var(--soft);text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);text-transform:uppercase;letter-spacing:.06em}
+    .table td{padding:8px 10px;color:var(--muted);border-bottom:1px solid var(--line);line-height:1.5}
+    .table td:first-child{color:var(--ink);font-weight:600;width:35%}
+    .table tr:last-child td{border-bottom:none}
+
+    .footer{padding:2rem;text-align:center;color:var(--soft);font-size:.68rem;border-top:1px solid var(--line);max-width:900px;margin:0 auto}
+
+    @media(max-width:768px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{display:none}
+      .content{padding:1.5rem 1rem 3rem}
+      .hero{padding:2.5rem 1rem 1.5rem}
+      .tabs{padding:0 .8rem}
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <span>Termos de Uso</span>
+  <span class="ver">v1.0 · Jun 2026</span>
+</header>
+
+<div class="hero">
+  <span>Termos legais</span>
+  <h1>Termos e <em>Condições</em> de Uso</h1>
+  <p>Este documento rege o uso deste site e a relação entre os usuários e o criador de conteúdo. Leia com atenção. Em conformidade com a LGPD (Lei nº 13.709/2018).</p>
+</div>
+
+<div class="tabs-wrap">
+  <nav class="tabs" id="tabNav">
+    <button class="tab-btn active" data-tab="geral">📋 Visão Geral</button>
+    <button class="tab-btn" data-tab="conteudo">🔞 Conteúdo +18</button>
+    <button class="tab-btn" data-tab="privacidade">🔒 Privacidade & LGPD</button>
+    <button class="tab-btn" data-tab="direitos">©️ Direitos</button>
+    <button class="tab-btn" data-tab="responsabilidades">⚖️ Responsabilidades</button>
+  </nav>
+</div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar"><div id="sidebarLinks"></div></aside>
+  <main class="content" id="mainContent">
+
+    <!-- GERAL -->
+    <div class="panel active" id="panel-geral">
+      <div class="section" id="g-aceite">
+        <div class="section-title"><span class="num">§1</span> Aceitação dos Termos</div>
+        <p>Ao acessar este site, você declara que leu, compreendeu e aceita integralmente estes Termos de Uso. Caso não concorde com qualquer disposição, não utilize este site.</p>
+        <p>Estes termos aplicam-se a todas as páginas, links, conteúdos e interações disponíveis neste domínio.</p>
+        <div class="callout info"><strong>ℹ️ Menores de 18 anos:</strong> Este site contém conteúdo adulto. É proibido o acesso por menores de 18 anos.</div>
+      </div>
+
+      <div class="section" id="g-alteracoes">
+        <div class="section-title"><span class="num">§2</span> Alterações nos Termos</div>
+        <p>Os termos podem ser alterados a qualquer momento. Recomendamos a leitura periódica. O uso continuado do site após alterações implica na aceitação dos novos termos.</p>
+      </div>
+
+      <div class="section" id="g-partes">
+        <div class="section-title"><span class="num">§3</span> Partes Envolvidas</div>
+        <table class="table">
+          <tr><th>Parte</th><th>Descrição</th></tr>
+          <tr><td>Criador de Conteúdo</td><td>Mauricio Drew Bieber — responsável pelo conteúdo disponibilizado.</td></tr>
+          <tr><td>Desenvolvedor</td><td>Anderson Honorato — responsável pelo desenvolvimento e manutenção técnica do site.</td></tr>
+          <tr><td>Usuário / Visitante</td><td>Pessoa que acessa e interage com o site.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- CONTEÚDO -->
+    <div class="panel" id="panel-conteudo">
+      <div class="section" id="c-adulto">
+        <div class="section-title"><span class="num">§4</span> Conteúdo Adulto</div>
+        <p>Todo o conteúdo deste site é destinado <strong>exclusivamente a maiores de 18 anos</strong>. Ao acessar, você confirma que possui idade legal para consumir conteúdo adulto em seu país.</p>
+        <div class="callout danger"><strong>🚫 Proibido:</strong> Compartilhar, redistribuir ou divulgar qualquer conteúdo adquirido sem autorização expressa do criador.</div>
+      </div>
+
+      <div class="section" id="c-packs">
+        <div class="section-title"><span class="num">§5</span> Packs e Conteúdo</div>
+        <p>Os packs de conteúdo são produtos digitais. Ao adquiri-los:</p>
+        <ul class="check">
+          <li><strong>Entrega digital:</strong> O conteúdo é enviado via link privado após confirmação do pagamento.</li>
+          <li><strong>Uso pessoal:</strong> O conteúdo adquirido é para uso pessoal e intransferível.</li>
+          <li><strong>Sem reembolso:</strong> Por ser conteúdo digital de acesso imediato, não há política de reembolso após a entrega.</li>
+          <li><strong>Personalizado:</strong> Conteúdo sob encomenda tem prazo e valor combinados previamente.</li>
+        </ul>
+      </div>
+
+      <div class="section" id="c-previa">
+        <div class="section-title"><span class="num">§6</span> Prévias e Modal +18</div>
+        <p>As prévias exibidas no site são amostras do conteúdo. Ao clicar em "ver prévia" no modal +18, você confirma novamente ser maior de idade e assume responsabilidade pelo conteúdo visualizado.</p>
+      </div>
+    </div>
+
+    <!-- PRIVACIDADE -->
+    <div class="panel" id="panel-privacidade">
+      <div class="section" id="p-lgpd">
+        <div class="section-title"><span class="num">§7</span> Conformidade LGPD</div>
+        <p>Este site cumpre a <strong>Lei Geral de Proteção de Dados (Lei nº 13.709/2018)</strong> no tratamento de dados pessoais. Seguimos os princípios de finalidade, transparência, segurança e necessidade.</p>
+      </div>
+
+      <div class="section" id="p-dados">
+        <div class="section-title"><span class="num">§8</span> Dados Coletados</div>
+        <table class="table">
+          <tr><th>Dado</th><th>Finalidade</th><th>Base Legal (LGPD)</th></tr>
+          <tr><td>Preferência de tema</td><td>Salvar tema escolhido (claro/escuro).</td><td>Legítimo interesse</td></tr>
+          <tr><td>Consentimento de cookies</td><td>Registrar aceite/recusa de cookies locais.</td><td>Consentimento</td></tr>
+          <tr><td>Contador de fãs (local)</td><td>Exibir histórico de visitas no dispositivo.</td><td>Legítimo interesse</td></tr>
+          <tr><td>Mensagens via WhatsApp</td><td>Comunicação direta com o criador (plataforma externa).</td><td>Consentimento</td></tr>
+        </table>
+        <div class="callout warn"><strong>⚠️ Importante:</strong> Não coletamos dados de navegação, analytics, rastreamento ou cookies de terceiros.</div>
+      </div>
+
+      <div class="section" id="p-armazenamento">
+        <div class="section-title"><span class="num">§9</span> Armazenamento Local</div>
+        <p>Utilizamos <strong>localStorage</strong> e <strong>sessionStorage</strong> do navegador para armazenar preferências. Esses dados ficam apenas no seu dispositivo e nunca são enviados a servidores. Você pode limpá-los nas configurações do navegador a qualquer momento.</p>
+      </div>
+
+      <div class="section" id="p-direitos">
+        <div class="section-title"><span class="num">§10</span> Direitos do Titular (LGPD)</div>
+        <p>Conforme a LGPD, você tem direito a:</p>
+        <ul class="check">
+          <li><strong>Acesso:</strong> Saber quais dados seus estão armazenados.</li>
+          <li><strong>Correção:</strong> Solicitar correção de dados incompletos.</li>
+          <li><strong>Exclusão:</strong> Solicitar a remoção de dados.</li>
+          <li><strong>Revogação:</strong> Revogar consentimento a qualquer momento.</li>
+        </ul>
+        <p>Para exercer esses direitos, entre em contato pelo WhatsApp ou e-mail disponível no site.</p>
+      </div>
+
+      <div class="section" id="p-compartilhamento">
+        <div class="section-title"><span class="num">§11</span> Compartilhamento de Dados</div>
+        <p>Seus dados <strong>nunca são vendidos, alugados ou compartilhados</strong> com terceiros para fins comerciais. A comunicação via WhatsApp é regida pela política de privacidade da Meta.</p>
+      </div>
+    </div>
+
+    <!-- DIREITOS -->
+    <div class="panel" id="panel-direitos">
+      <div class="section" id="d-autorais">
+        <div class="section-title"><span class="num">§12</span> Direitos Autorais</div>
+        <p>Todo o conteúdo deste site (textos, imagens, fotos, vídeos, design e código) é protegido por direitos autorais. É proibida a reprodução, distribuição ou uso não autorizado.</p>
+        <ul class="cross">
+          <li>Reproduzir ou distribuir fotos e vídeos sem autorização.</li>
+          <li>Utilizar o código-fonte ou design do site sem permissão.</li>
+          <li>Alegar autoria sobre conteúdo criado por Mauricio Drew Bieber.</li>
+        </ul>
+      </div>
+
+      <div class="section" id="d-marca">
+        <div class="section-title"><span class="num">§13</span> Marca e Identidade Visual</div>
+        <p>Mauricio Drew Bieber é uma marca pessoal. O uso do nome, imagem ou identidade visual associada requer autorização expressa.</p>
+      </div>
+
+      <div class="section" id="d-dev">
+        <div class="section-title"><span class="num">§14</span> Desenvolvimento do Site</div>
+        <p>Este site foi desenvolvido por <strong>Anderson Honorato</strong>. O código e design são de sua autoria. Para solicitar um site semelhante, acesse o portfólio no link do rodapé.</p>
+      </div>
+    </div>
+
+    <!-- RESPONSABILIDADES -->
+    <div class="panel" id="panel-responsabilidades">
+      <div class="section" id="r-criador">
+        <div class="section-title"><span class="num">§15</span> Responsabilidades do Criador</div>
+        <ul class="check">
+          <li>Entregar o conteúdo adquirido conforme o combinado.</li>
+          <li>Manter sigilo sobre dados de clientes.</li>
+          <li>Responder dúvidas em tempo razoável.</li>
+        </ul>
+      </div>
+
+      <div class="section" id="r-usuario">
+        <div class="section-title"><span class="num">§16</span> Responsabilidades do Usuário</div>
+        <ul class="check">
+          <li>Ser maior de 18 anos.</li>
+          <li>Não compartilhar ou redistribuir o conteúdo adquirido.</li>
+          <li>Não utilizar o site para fins ilegais.</li>
+          <li>Não tentar burlar o modal de verificação de idade.</li>
+        </ul>
+        <div class="callout danger"><strong>⚖️ Limite de responsabilidade:</strong> O criador e o desenvolvedor não se responsabilizam por danos indiretos decorrentes do uso ou impossibilidade de uso do site.</div>
+      </div>
+
+      <div class="section" id="r-foro">
+        <div class="section-title"><span class="num">§17</span> Foro de Eleição</div>
+        <p>Para dirimir quaisquer controvérsias oriundas destes termos, fica eleito o foro da Comarca de Cajamar, Estado de São Paulo, Brasil.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<footer class="footer">
+  <span>© 2026 Mauricio Drew Bieber · Todos os direitos reservados</span><br>
+  <span>Em conformidade com a LGPD (Lei nº 13.709/2018) e o Código Civil Brasileiro (Lei nº 10.406/2002)</span>
+</footer>
+
+<script>
+const tabData = {
+  geral: [
+    {num:'§1',label:'Aceitação dos Termos',id:'g-aceite'},
+    {num:'§2',label:'Alterações nos Termos',id:'g-alteracoes'},
+    {num:'§3',label:'Partes Envolvidas',id:'g-partes'},
+  ],
+  conteudo: [
+    {num:'§4',label:'Conteúdo Adulto',id:'c-adulto'},
+    {num:'§5',label:'Packs e Conteúdo',id:'c-packs'},
+    {num:'§6',label:'Prévias e Modal +18',id:'c-previa'},
+  ],
+  privacidade: [
+    {num:'§7',label:'Conformidade LGPD',id:'p-lgpd'},
+    {num:'§8',label:'Dados Coletados',id:'p-dados'},
+    {num:'§9',label:'Armazenamento Local',id:'p-armazenamento'},
+    {num:'§10',label:'Direitos do Titular',id:'p-direitos'},
+    {num:'§11',label:'Compartilhamento',id:'p-compartilhamento'},
+  ],
+  direitos: [
+    {num:'§12',label:'Direitos Autorais',id:'d-autorais'},
+    {num:'§13',label:'Marca e Identidade',id:'d-marca'},
+    {num:'§14',label:'Desenvolvimento',id:'d-dev'},
+  ],
+  responsabilidades: [
+    {num:'§15',label:'Resp. do Criador',id:'r-criador'},
+    {num:'§16',label:'Resp. do Usuário',id:'r-usuario'},
+    {num:'§17',label:'Foro de Eleição',id:'r-foro'},
+  ],
+};
+
+let current='geral';
+
+function switchTab(tab){
+  current=tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id==='panel-'+tab));
+  renderSidebar();
+  window.scrollTo({top:document.querySelector('.tabs-wrap').offsetTop-56,behavior:'smooth'});
+}
+
+document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+
+function renderSidebar(){
+  const c=document.getElementById('sidebarLinks');
+  c.innerHTML=(tabData[current]||[]).map(i=>`
+    <a onclick="scrollToSection('${i.id}')"><span class="num">${i.num}</span>${i.label}</a>
+  `).join('');
+}
+function scrollToSection(id){const e=document.getElementById(id);if(e)e.scrollIntoView({behavior:'smooth',block:'start'})}
+renderSidebar();
+
+window.addEventListener('scroll',()=>{
+  const links=document.querySelectorAll('.sidebar a');
+  links.forEach(l=>l.classList.remove('active'));
+  const items=tabData[current]||[];
+  let active=null;
+  for(const i of items){const e=document.getElementById(i.id);if(e&&e.getBoundingClientRect().top<=130)active=i.id}
+  if(active)links.forEach(l=>{if(l.getAttribute('onclick')?.includes(active))l.classList.add('active')});
+},{passive:true});
+</script>
+</body>
+</html>

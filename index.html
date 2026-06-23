@@ -25,14 +25,15 @@
 
   <header class="site-header" id="siteHeader">
     <a class="brand" href="#top" aria-label="Voltar ao topo">
-      <span class="brand-mark">D</span>
-      <span class="brand-copy">Drew links</span>
+      <img class="brand-icon" src="assets/icones/metrys-icon.png" alt="Metrys" />
+      <span class="brand-copy"><em>Metrys</em> Link</span>
     </a>
 
     <nav class="header-nav" aria-label="Navegação principal">
       <a href="#links">Links</a> 
       <a href="#packs">Packs</a>
       <a href="#previas">Prévias</a>
+      <a href="#depoimentos">Comentários</a>
     </nav>
 
     <div class="header-actions">
@@ -42,11 +43,14 @@
   </header>
 
   <aside class="side-rail" id="sideRail" aria-label="Acessos rápidos">
-    <a href="#top" class="rail-btn rail-top" aria-label="Voltar ao topo">↑</a>
     <a href="#links" class="rail-btn">links</a>
     <a href="#packs" class="rail-btn">packs</a>
     <a href="#previas" class="rail-btn">fotos</a>
+    <a href="#depoimentos" class="rail-btn">feed</a>
+    <a href="#top" class="rail-btn rail-top" aria-label="Voltar ao topo">↑</a>
   </aside>
+
+  <div class="purchase-toasts" id="purchaseToasts" aria-live="polite"></div>
 
   <a class="whatsapp-float" href="https://wa.me/5511950818317?text=Oi%20Mauricio%2C%20quero%20saber%20mais%20sobre%20os%20packs%20de%20conte%C3%BAdo" target="_blank" rel="noopener" aria-label="Chamar no WhatsApp">
     <span>✦</span>
@@ -54,16 +58,31 @@
   </a>
 
   <div class="wa-assistant" id="waAssistant" aria-live="polite">
-    <button class="wa-close" id="waClose" type="button" aria-label="Fechar mensagem">×</button>
-    <span class="wa-avatar">✦</span>
-    <div>
-      <strong id="waTitle">Drew bot</strong>
-      <p id="waText">Quer ver os packs mais pedidos?</p>
-      <a id="waBubbleLink" href="https://wa.me/5511950818317" target="_blank" rel="noopener">chamar agora</a>
+    <div class="wa-chat-header">
+      <span class="wa-avatar">✦</span>
+      <div>
+        <strong>Metrys IA</strong>
+        <small id="waStatus">estou online no momento</small>
+      </div>
+      <button class="wa-close" id="waClose" type="button" aria-label="Fechar">×</button>
+    </div>
+    <div class="wa-chat-body" id="waChatBody"></div>
+    <div class="wa-chat-float">
+      <div class="wa-chat-options" id="waOptions"></div>
+      <div class="wa-chat-input">
+        <input id="waInput" type="text" placeholder="Digite sua mensagem..." maxlength="200" autocomplete="off" />
+        <button id="waSend" type="button">➤</button>
+      </div>
     </div>
   </div>
 
   <main id="top" class="page-shell">
+    <a class="featured-link" href="https://wa.me/5511950818317?text=Oi%20Mauricio%2C%20quero%20o%20pack%20do%20momento!" target="_blank" rel="noopener">
+      <span class="featured-icon">◆</span>
+      <span class="featured-label">Pack do momento</span>
+      <span class="featured-arrow">→</span>
+    </a>
+
     <section class="profile-card" aria-labelledby="profileTitle">
       <div class="profile-cover">
         <div class="cover-slider">
@@ -76,22 +95,23 @@
         <button class="cover-arrow cover-arrow-left" id="coverPrev" type="button" aria-label="Foto anterior">‹</button>
         <button class="cover-arrow cover-arrow-right" id="coverNext" type="button" aria-label="Próxima foto">›</button>
         <div class="cover-dots" id="coverDots" aria-label="Indicadores de capa"></div>
+        <div class="cover-stats" id="coverStats">♥ 2.000+ fãs · <span class="cdot"></span> 47 online</div>
 
         <div class="profile-info-grid">
           <div class="profile-icon-card">
             <img src="assets/capas/1.jpg" onerror="this.src='assets/capas/1.svg'" alt="Ícone de perfil Mauricio Drew Bieber" />
-            <span class="profile-icon-mark">D</span>
+            <span class="profile-icon-mark" title="Verificado">✓</span>
           </div>
 
           <div class="profile-copy">
-            <span class="profile-pill">✦ Conteúdo, Fotos e Vídeos</span>
             <h1 id="profileTitle">Mauricio <em>Drew</em> Bieber</h1>
             <p>Somente para venda de conteúdo +18. Links logo abaixo.</p>
             <div class="profile-meta">
+               <span class="red-tag">garoto GP</span>
               <span>brasileiro</span>
               <span>26 anos</span>
               <span>📍 Cajamar • SP</span>
-              <span class="red-tag">só para maiores</span>
+              <span class="red-tag">criador de conteúdo</span>
             </div>
           </div>
         </div>
@@ -117,32 +137,14 @@
       </div>
     </section>
 
-    <section id="packs" class="section-block">
-      <div class="section-title">
-        <span class="title-icon">♡</span>
-        <div>
-          <small>packs e contato</small>
-          <h2>Sobre meus packs de conteúdos</h2>
-          <p>Tenho uma variedade de conteúdo, vídeos, fotos, gozadas e amador. </p>
-        </div>
-      </div>
-
-      <div class="mini-grid">
-        <article>
-          <b>✦</b>
-          <h3>Privacy oficial</h3>
-          <p>Conteúdo exclusivo para assinantes do Privacy.</p>
-        </article>
-        <article>
-          <b>♡</b>
-          <h3>Veja uma prévia</h3>
-          <p>Clique nos cards abaixo para ver prévias dos meus conteúdos.</p>
-        </article>
-        <article>
-          <b>↗</b>
-          <h3>Fale comigo</h3>
-          <p>Clique no botão de contato para combinar valores e outras informações.</p>
-        </article>
+    <section id="packs" class="packs-banner">
+      <img src="assets/capas/6.jpg" onerror="this.style.display='none'" alt="" class="packs-banner-bg" />
+      <div class="packs-banner-overlay"></div>
+      <div class="packs-banner-content">
+        <span class="packs-banner-tag">+18</span>
+        <h2>Conteúdo exclusivo</h2>
+        <p>Fotos, vídeos, gozadas e muito mais no privado. Vem ver o que eu preparei pra você.</p>
+        <a class="packs-banner-cta" href="https://wa.me/5511950818317?text=Oi%20Mauricio%2C%20quero%20ver%20os%20packs!" target="_blank" rel="noopener">Quero ver agora →</a>
       </div>
     </section>
 
@@ -166,15 +168,24 @@
       </div>
     </section>
 
-    <section class="creator-link">
-      <a href="https://anderhonorato.github.io/meu-portfolio/index.html" target="_blank" rel="noopener">
-        crie seu próprio link site com Anderson Honorato
-      </a>
+    <section id="depoimentos" class="section-block">
+      <div class="section-title">
+        <span class="title-icon">★</span>
+        <div>
+          <small>comentários de clientes</small>
+          <h2>O que estão dizendo <span class="section-score" id="sectionScore"></span></h2>
+          <p>Feedbacks de quem já adquiriu meus packs.</p>
+        </div>
+      </div>
+
+      <div class="testimonials-grid" id="testimonialsGrid"></div>
     </section>
 
     <footer class="footer">
       <span>© <span id="year"></span> Mauricio Drew Bieber</span>
-      <a href="https://anderhonorato.github.io/meu-portfolio/index.html" target="_blank" rel="noopener">Criado por Anderson Honorato</a>
+      <a href="#" id="devLink">Criado por Anderson Honorato</a>
+      <a href="#" id="faqLink">Dúvidas frequentes</a>
+      <a href="#" id="termsLink">Termos de Uso</a>
     </footer>
   </main>
 
@@ -192,6 +203,8 @@
           <p>Ao clicar em ver previa agora, você concorda que tem 18 anos ou mais.</p>
           <button id="unlockAdult" type="button">ver prévia agora</button>
         </div>
+        <button class="modal-nav modal-nav-left" id="photoModalPrev" type="button" aria-label="Anterior">‹</button>
+        <button class="modal-nav modal-nav-right" id="photoModalNext" type="button" aria-label="Próximo">›</button>
       </div>
 
       <div class="modal-copy">
@@ -235,6 +248,88 @@
     <div class="cookie-actions">
       <button id="cookieReject" type="button">Recusar</button>
       <button id="cookieAccept" type="button">Aceitar</button>
+    </div>
+  </div>
+
+  <div class="modal" id="packsModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-packs></div>
+    <div class="packs-box" role="dialog" aria-modal="true" aria-label="Sobre os packs">
+      <button class="modal-close" type="button" data-close-packs aria-label="Fechar">×</button>
+      <div class="packs-box-header">
+        <span class="packs-box-icon" id="packsIcon">✦</span>
+        <h2 id="packsTitle">Privacy oficial</h2>
+      </div>
+      <p id="packsText">Conteúdo exclusivo para assinantes do Privacy.</p>
+      <div class="packs-extended" id="packsExtended"></div>
+      <div class="packs-nav">
+        <button id="packsPrev" type="button" aria-label="Mensagem anterior">‹ Anterior</button>
+        <span id="packsCounter">1 / 3</span>
+        <button id="packsNext" type="button" aria-label="Próxima mensagem">Próximo ›</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="hubModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-hub></div>
+    <div class="hub-box" role="dialog" aria-modal="true" aria-label="Desenvolvedor">
+      <button class="modal-close" type="button" data-close-hub aria-label="Fechar">×</button>
+      <div class="dev-avatar">AH</div>
+      <strong>Anderson Honorato</strong>
+      <span class="dev-role">Desenvolvedor Full Stack</span>
+      <p>Gostou da página? Quer uma igual pra você?</p>
+      <p>Cadastre-se e tenha seu próprio link site profissional. Monte do seu jeito, com seu conteúdo e suas redes. Sites, landing pages e hotsites com design único e entrega rápida.</p>
+      <div class="dev-links">
+        <a href="https://wa.me/5511940652843?text=Oi%20Anderson%2C%20quero%20criar%20meu%20link%20site!" target="_blank" rel="noopener">↗ Quero me cadastrar</a>
+        <a href="https://anderhonorato.github.io/meu-portfolio/index.html" target="_blank" rel="noopener">↗ Ver portfólio</a>
+        <a href="https://github.com/AnderHonorato" target="_blank" rel="noopener">↗ GitHub</a>
+        <button id="devCopyContact" type="button">◈ Copiar contato</button>
+      </div>
+      <small>© 2026 Metrys · Todos os direitos reservados</small>
+    </div>
+  </div>
+
+  <div class="modal" id="faqModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-faq></div>
+    <div class="faq-box" role="dialog" aria-modal="true" aria-label="Dúvidas frequentes">
+      <button class="modal-close" type="button" data-close-faq aria-label="Fechar">×</button>
+      <strong>Dúvidas frequentes</strong>
+      <div class="faq-list" id="faqList"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="termsModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-terms></div>
+    <div class="terms-frame-box" role="dialog" aria-modal="true" aria-label="Termos de Uso">
+      <button class="modal-close" type="button" data-close-terms aria-label="Fechar">×</button>
+      <iframe id="termsFrame" src="termos.html" title="Termos de Uso"></iframe>
+    </div>
+  </div>
+
+  <div class="modal" id="commentsModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-comments></div>
+    <div class="comments-box" role="dialog" aria-modal="true" aria-label="Comentários">
+      <button class="modal-close" type="button" data-close-comments aria-label="Fechar">×</button>
+      <div class="comments-score" id="commentsScore"></div>
+      <strong>Comentários</strong>
+      <div class="comments-original" id="commentsOriginal"></div>
+      <div class="comments-divider"><span id="commentsCount">Comentários</span></div>
+      <div class="comments-list" id="commentsList"></div>
+      <div class="comments-form">
+        <input id="commentName" type="text" placeholder="Seu nome" maxlength="30" />
+        <textarea id="commentText" rows="2" placeholder="Escreva seu comentário..." maxlength="300"></textarea>
+        <button id="commentSubmit" type="button">Enviar comentário</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="confirmModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-confirm></div>
+    <div class="confirm-box" role="dialog" aria-modal="true">
+      <p id="confirmText">Tem certeza?</p>
+      <div class="confirm-actions">
+        <button id="confirmYes" type="button">Sim</button>
+        <button id="confirmNo" type="button">Não</button>
+      </div>
     </div>
   </div>
 
