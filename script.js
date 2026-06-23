@@ -930,7 +930,6 @@ function setupWhatsAssistant() {
     const floatWrap = document.querySelector(".wa-chat-float");
     if (inputWrap) inputWrap.style.display = "none";
     if (floatWrap) floatWrap.style.display = "none";
-    assistant.style.height = "auto";
     assistant.classList.add("is-visible");
     waMessageIndex++;
     waAutoHideTimer = setTimeout(() => { assistant.classList.remove("is-visible"); waRepeatTimer = setTimeout(showNextAutoMessage, 3 * 60 * 1000); }, 12000);
@@ -944,7 +943,6 @@ function setupWhatsAssistant() {
     clearTimeout(waAutoHideTimer); clearTimeout(waRepeatTimer);
     setTimeout(() => {
       body.innerHTML = "";
-      assistant.style.height = "";
       assistant.classList.add("is-visible");
       document.querySelector(".wa-chat-input").style.display = "flex";
       document.querySelector(".wa-chat-float").style.display = "";

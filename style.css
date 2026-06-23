@@ -364,10 +364,11 @@ button {
 
 .wa-assistant {
   position: fixed;
-  right: 14px; bottom: 70px; z-index: 92;
+  right: 8px; bottom: 14px; z-index: 92;
   display: flex; flex-direction: column;
-  width: min(340px, calc(100vw - 28px));
-  height: min(440px, calc(100dvh - 140px));
+  width: min(340px, calc(100vw - 16px));
+  max-height: min(440px, 55dvh);
+  height: auto;
   border: 1px solid var(--line-strong);
   border-radius: 20px;
   background: var(--panel);
@@ -2182,54 +2183,32 @@ button {
 
 /* Purchase notifications */
 .purchase-toasts {
-  position: fixed;
-  left: 14px;
-  bottom: 14px;
-  z-index: 95;
-  display: flex;
-  flex-direction: column-reverse;
-  gap: 8px;
-  pointer-events: none;
-  max-width: 280px;
+  position: fixed; left: 10px; bottom: 14px; z-index: 95;
+  display: flex; flex-direction: column-reverse; gap: 5px;
+  pointer-events: none; max-width: 200px;
 }
 
 .purchase-notify {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 11px 14px;
-  border: 1.5px solid var(--line-strong);
-  border-radius: 16px;
-  background: color-mix(in srgb, var(--panel) 96%, transparent);
-  color: var(--ink);
-  font-size: .68rem;
-  font-weight: 700;
-  box-shadow: 0 6px 22px rgba(0,0,0,.22);
-  pointer-events: auto;
-  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--panel) 70%, transparent);
+  color: var(--ink); font-size: .58rem; font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,.1);
+  opacity: .72; pointer-events: auto; cursor: pointer;
   animation: purchaseIn .4s var(--ease), purchaseOut .5s var(--ease) 7s forwards;
 }
 
 .purchase-notify .pn-avatar {
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
-  display: grid;
-  place-items: center;
-  border-radius: 12px;
-  font-size: .8rem;
-  font-weight: 900;
-  color: #fff;
+  width: 24px; height: 24px; flex: 0 0 24px;
+  display: grid; place-items: center; border-radius: 7px;
+  font-size: .55rem; font-weight: 900; color: #fff;
 }
 
-.purchase-notify .pn-info {
-  min-width: 0;
-  line-height: 1.3;
-}
-
-.purchase-notify .pn-info strong { display: block; font-size: .7rem; }
-.purchase-notify .pn-info span { color: var(--muted); font-size: .62rem; }
-.purchase-notify .pn-stats { display: flex; gap: 8px; margin-top: 3px; font-size: .58rem; color: var(--soft); }
+.purchase-notify .pn-info { min-width: 0; line-height: 1.2; }
+.purchase-notify .pn-info strong { font-size: .58rem; }
+.purchase-notify .pn-info span { color: var(--muted); font-size: .52rem; }
 
 @keyframes purchaseIn {
   from { opacity: 0; transform: translateY(20px) scale(.9); }
@@ -2242,7 +2221,7 @@ button {
 }
 
 @media (max-width: 760px) {
-  .purchase-toasts { left: 10px; bottom: 64px; max-width: 240px; }
+  .purchase-toasts { left: 6px; bottom: 58px; max-width: 160px; }
 }
 
 /* Toast */
@@ -2517,6 +2496,7 @@ button {
   border-radius: 20px;
   background: var(--panel);
   color: var(--ink);
+  transform: translateX(-50%);
 }
 
 .cookie-banner.is-visible {
@@ -2639,27 +2619,35 @@ button {
   }
 
   .profile-copy h1 {
-    font-size: clamp(2.1rem, 12vw, 3.4rem);
+    font-size: clamp(1.6rem, 9vw, 2.4rem);
+    margin: 6px 0 4px;
   }
 
   .profile-copy p {
-    font-size: .78rem;
+    font-size: .7rem;
+    margin-bottom: 4px;
   }
 
   .profile-meta span {
-    font-size: .62rem;
+    font-size: .58rem;
+    padding: 4px 7px;
   }
 
   .social-board {
-    grid-template-columns: 1fr 1fr;
-    padding: 10px;
-    gap: 7px;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 8px;
+    gap: 5px;
   }
 
   .social-board a {
-    min-height: 60px;
-    padding: 10px 9px;
+    min-height: 50px;
+    padding: 8px 6px;
+    border-radius: 12px;
   }
+
+  .social-board span { font-size: .64rem; }
+  .social-board small { font-size: .52rem; max-width: none; }
+  .social-board a::after { right: 6px; top: 6px; font-size: .6rem; }
 
   .section-block {
     margin-top: 12px;
@@ -2794,7 +2782,7 @@ button {
   }
 
   .profile-copy h1 {
-    font-size: 2.15rem;
+    font-size: 1.55rem;
   }
 
   .profile-copy p {
@@ -2802,7 +2790,7 @@ button {
   }
 
   .social-board small {
-    font-size: .6rem;
+    font-size: .5rem;
   }
 
   .preview-card {
