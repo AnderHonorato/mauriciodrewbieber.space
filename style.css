@@ -98,6 +98,7 @@ html[data-theme="black"] {
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 82px;
   scrollbar-width: thin;
   scrollbar-color: var(--red) var(--panel-2);
   transition: background-color .45s ease;
@@ -141,6 +142,11 @@ a {
 
 button {
   cursor: pointer;
+}
+
+:where(a, button, input, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 3px;
 }
 
 .square-bg {
@@ -235,6 +241,11 @@ button {
 .header-nav a:hover {
   background: var(--panel-2);
   color: var(--ink);
+}
+
+.header-nav a.is-active {
+  background: var(--red-soft);
+  color: var(--red);
 }
 
 .header-actions {
@@ -495,6 +506,11 @@ button {
   overflow: hidden;
   border-bottom: 1.5px solid var(--line-strong);
   background: var(--panel-3);
+  touch-action: pan-y;
+}
+
+.profile-cover:focus-visible {
+  outline-offset: -4px;
 }
 
 .cover-slider,

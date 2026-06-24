@@ -12,6 +12,9 @@ const APP = Object.freeze({
 
 const AUTO_DELAY_MIN = 5 * 60 * 1000;
 const AUTO_DELAY_MAX = 10 * 60 * 1000;
+const AUTO_INTERRUPTION_LIMIT = 3;
+const AUTO_INTERRUPTION_COUNT_KEY = "mdb_auto_interruptions_v1";
+const IA_ENGAGED_KEY = "mdb_ia_engaged_v1";
 const USER_COMMENTS_KEY = "mdb_user_comments_v1";
 
 const PREVIEWS = [
@@ -73,6 +76,7 @@ let modalIndex = 0;
 let waMessageIndex = 0;
 let waAutoHideTimer = null;
 let waRepeatTimer = null;
+const modalFocusState = new WeakMap();
 
 const storage = {
   allowed() {
@@ -191,12 +195,12 @@ let purchaseNotifyTimer = null;
 let notificationsDisabled = localStorage.getItem("mdb_notify_off") === "1";
 
 function startPurchaseNotifications() {
-  if (notificationsDisabled || purchaseNotifyTimer) return;
+  if (notificationsDisabled || purchaseNotifyTimer || !canShowAutoInterruption()) return;
   schedulePurchaseNotification();
 }
 
 function schedulePurchaseNotification() {
-  if (notificationsDisabled) return;
+  if (notificationsDisabled || !canShowAutoInterruption()) return;
   clearTimeout(purchaseNotifyTimer);
   purchaseNotifyTimer = setTimeout(() => {
     purchaseNotifyTimer = null;
@@ -214,7 +218,7 @@ function stopPurchaseNotifications() {
 
 function spawnPurchaseNotify() {
   const container = document.getElementById("purchaseToasts");
-  if (!container || notificationsDisabled) return;
+  if (!container || notificationsDisabled || !canShowAutoInterruption()) return;
   if (document.hidden || hasActiveInterruption()) {
     schedulePurchaseNotification();
     return;
@@ -260,9 +264,10 @@ function spawnPurchaseNotify() {
   });
 
   container.appendChild(el);
+  recordAutoInterruption();
   setTimeout(() => {
     if (el.parentNode) el.remove();
-    schedulePurchaseNotification();
+    if (canShowAutoInterruption()) schedulePurchaseNotification();
   }, 7600);
 }
 
@@ -476,10 +481,13 @@ function setupFaqModal() {
   const list = document.getElementById("faqList");
   if (!modal || !list) return;
 
-  list.innerHTML = FAQ_DATA.map(item => `
-    <div class="faq-item"><button class="faq-q" type="button">${item.q}</button><div class="faq-a">${item.a}</div></div>
+  list.innerHTML = FAQ_DATA.map((item, index) => `
+    <div class="faq-item"><button class="faq-q" type="button" aria-expanded="false" aria-controls="faqAnswer${index}">${item.q}</button><div class="faq-a" id="faqAnswer${index}" role="region">${item.a}</div></div>
   `).join("");
-  list.querySelectorAll(".faq-q").forEach(btn => btn.addEventListener("click", () => btn.parentElement.classList.toggle("is-open")));
+  list.querySelectorAll(".faq-q").forEach(btn => btn.addEventListener("click", () => {
+    const isOpen = btn.parentElement.classList.toggle("is-open");
+    btn.setAttribute("aria-expanded", String(isOpen));
+  }));
 
   document.getElementById("faqLink").addEventListener("click", e => { e.preventDefault(); setModalState(modal, true); });
   document.querySelectorAll("[data-close-faq]").forEach(el => el.addEventListener("click", () => setModalState(modal, false)));
@@ -534,6 +542,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupPreviewCarousel();
   setupModal();
   setupShareModal();
+  setupPackDetailsModal();
   setupDevModal();
   setupFaqModal();
   setupTermsModal();
@@ -579,31 +588,55 @@ function setupHeaderBehavior() {
   const header = document.getElementById("siteHeader");
   const rail = document.getElementById("sideRail");
   let lastY = window.scrollY;
-  window.addEventListener("scroll", () => {
+  let ticking = false;
+
+  function update() {
     const y = window.scrollY;
-    if (y > lastY && y > 170) { header.classList.add("is-hidden"); rail.classList.add("is-visible"); }
-    else { header.classList.remove("is-hidden"); if (y < 140) rail.classList.remove("is-visible"); }
+    if (y > lastY && y > 170) {
+      header.classList.add("is-hidden");
+      rail.classList.add("is-visible");
+    } else {
+      header.classList.remove("is-hidden");
+      if (y < 140) rail.classList.remove("is-visible");
+    }
     lastY = y;
-    updateActiveRail();
+    updateActiveNavigation();
+    ticking = false;
+  }
+
+  window.addEventListener("scroll", () => {
+    if (!ticking) {
+      window.requestAnimationFrame(update);
+      ticking = true;
+    }
   }, { passive: true });
+  updateActiveNavigation();
 }
 
-function updateActiveRail() {
-  const sections = ["links", "packs", "previas", "depoimentos"];
+function updateActiveNavigation() {
+  const sections = [
+    { id: "links", nav: "links" },
+    { id: "packs", nav: "packs" },
+    { id: "como-comprar", nav: "packs" },
+    { id: "previas", nav: "previas" },
+    { id: "depoimentos", nav: "depoimentos" }
+  ];
   const rail = document.getElementById("sideRail");
-  if (!rail || !rail.classList.contains("is-visible")) return;
-
-  let active = "";
-  sections.forEach(id => {
-    const el = document.getElementById(id);
+  let active = "links";
+  const probe = Math.min(window.innerHeight * .42, 360);
+  sections.forEach(item => {
+    const el = document.getElementById(item.id);
     if (el) {
       const rect = el.getBoundingClientRect();
-      if (rect.top <= window.innerHeight * .5 && rect.bottom >= 0) active = id;
+      if (rect.top <= probe && rect.bottom >= 0) active = item.nav;
     }
   });
 
-  rail.querySelectorAll(".rail-btn").forEach(btn => {
-    btn.classList.toggle("is-active", btn.getAttribute("href") === `#${active}`);
+  document.querySelectorAll('.header-nav a, .side-rail a[href^="#"]').forEach(link => {
+    const isActive = link.getAttribute("href") === `#${active}`;
+    link.classList.toggle("is-active", isActive);
+    if (isActive) link.setAttribute("aria-current", "location");
+    else link.removeAttribute("aria-current");
   });
 }
 
@@ -613,22 +646,61 @@ function setupCoverSlider() {
   const dotsWrap = document.getElementById("coverDots");
   const prev = document.getElementById("coverPrev");
   const next = document.getElementById("coverNext");
+  const cover = document.querySelector(".profile-cover");
   if (!slides.length) return;
   let current = 0, timer = null;
+  let touchStartX = 0, touchStartY = 0;
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   slides.forEach((_, index) => {
     const dot = document.createElement("button");
     dot.className = "cover-dot" + (index === 0 ? " active" : "");
     dot.type = "button"; dot.setAttribute("aria-label", `Ir para capa ${index + 1}`);
+    dot.setAttribute("aria-current", index === 0 ? "true" : "false");
     dot.addEventListener("click", () => { goTo(index); restart(); });
     dotsWrap.appendChild(dot);
   });
   const dots = [...dotsWrap.querySelectorAll(".cover-dot")];
 
-  function goTo(index) { slides[current].classList.remove("active"); dots[current].classList.remove("active"); current = (index + slides.length) % slides.length; slides[current].classList.add("active"); dots[current].classList.add("active"); }
-  function restart() { clearInterval(timer); timer = setInterval(() => goTo(current + 1), 8000); }
+  function goTo(index) {
+    slides[current].classList.remove("active");
+    dots[current].classList.remove("active");
+    dots[current].setAttribute("aria-current", "false");
+    current = (index + slides.length) % slides.length;
+    slides[current].classList.add("active");
+    dots[current].classList.add("active");
+    dots[current].setAttribute("aria-current", "true");
+  }
+  function pause() { clearInterval(timer); timer = null; }
+  function restart() {
+    pause();
+    if (!document.hidden && !reducedMotion.matches) timer = setInterval(() => goTo(current + 1), 8000);
+  }
   prev.addEventListener("click", () => { goTo(current - 1); restart(); });
   next.addEventListener("click", () => { goTo(current + 1); restart(); });
+
+  cover.addEventListener("keydown", event => {
+    if (event.key === "ArrowLeft") { event.preventDefault(); goTo(current - 1); restart(); }
+    if (event.key === "ArrowRight") { event.preventDefault(); goTo(current + 1); restart(); }
+  });
+  cover.addEventListener("touchstart", event => {
+    const touch = event.changedTouches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+    pause();
+  }, { passive: true });
+  cover.addEventListener("touchend", event => {
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - touchStartX;
+    const deltaY = touch.clientY - touchStartY;
+    if (Math.abs(deltaX) > 48 && Math.abs(deltaX) > Math.abs(deltaY)) goTo(current + (deltaX < 0 ? 1 : -1));
+    restart();
+  }, { passive: true });
+  cover.addEventListener("pointerenter", pause);
+  cover.addEventListener("pointerleave", restart);
+  cover.addEventListener("focusin", pause);
+  cover.addEventListener("focusout", event => { if (!cover.contains(event.relatedTarget)) restart(); });
+  document.addEventListener("visibilitychange", () => document.hidden ? pause() : restart());
   restart();
 }
 
@@ -639,7 +711,7 @@ function renderPreviewCards() {
   scroller.innerHTML = PREVIEWS.map((item, index) => `
     <article class="preview-card" data-index="${index}">
       <button class="preview-media" type="button" data-open-modal="${index}" aria-label="Abrir ${escapeHtml(item.title)}">
-        <img src="${item.normal}" onerror="this.src='${item.normalFallback}'" alt="${escapeHtml(item.title)}" />
+        <img src="${item.normal}" onerror="this.src='${item.normalFallback}'" alt="${escapeHtml(item.title)}" width="300" height="390" loading="lazy" decoding="async" />
         <span class="preview-label">Conteúdo adulto</span>
       </button>
       <div class="preview-body">
@@ -672,17 +744,17 @@ function setupModal() {
   document.addEventListener("keydown", event => {
     if (event.key === "Escape") {
       const pm = document.getElementById("photoModal"), sm = document.getElementById("shareModal");
-      if (pm.classList.contains("is-open")) closeModal();
       if (sm.classList.contains("is-open")) setModalState(sm, false);
+      else if (pm.classList.contains("is-open")) closeModal();
     }
   });
   document.getElementById("unlockAdult").addEventListener("click", () => modal.classList.add("is-unlocked"));
   document.getElementById("photoModalPrev").addEventListener("click", () => openModal((modalIndex - 1 + PREVIEWS.length) % PREVIEWS.length));
   document.getElementById("photoModalNext").addEventListener("click", () => openModal((modalIndex + 1) % PREVIEWS.length));
-  document.getElementById("modalShare").addEventListener("click", () => {
-    document.getElementById("shareUrlInput").value = window.location.href;
-    const sm = document.getElementById("shareModal"); setModalState(sm, true);
-  });
+  document.getElementById("modalShare").addEventListener("click", () => shareContent({
+    title: PREVIEWS[modalIndex].title,
+    text: PREVIEWS[modalIndex].text
+  }));
 }
 
 function openModal(index) {
@@ -715,12 +787,38 @@ function setupShareModal() {
     { label: "X / Twitter", url: APP.x }, { label: "WhatsApp", url: `https://wa.me/${APP.whatsapp}` }
   ];
   grid.innerHTML = socialLinks.map(l => `<a href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`).join("");
-  document.getElementById("sharePage").addEventListener("click", () => {
-    input.value = window.location.href; setModalState(modal, true);
-  });
+  document.getElementById("sharePage").addEventListener("click", () => shareContent());
   document.querySelectorAll("[data-close-share]").forEach(el => el.addEventListener("click", () => setModalState(modal, false)));
   document.getElementById("shareCopyBtn").addEventListener("click", async () => {
     try { await navigator.clipboard.writeText(window.location.href); showToast("Link copiado! ✓"); } catch (_) { input.select(); showToast("Selecione e copie o link acima"); }
+  });
+}
+
+async function shareContent({ title = document.title, text = "Confira os links e packs de Mauricio Drew Bieber." } = {}) {
+  const payload = { title, text, url: window.location.href };
+  const useNativeShare = typeof navigator.share === "function" && window.matchMedia("(max-width: 760px)").matches;
+  if (useNativeShare) {
+    try {
+      await navigator.share(payload);
+      return;
+    } catch (error) {
+      if (error?.name === "AbortError") return;
+    }
+  }
+  document.getElementById("shareUrlInput").value = payload.url;
+  setModalState(document.getElementById("shareModal"), true);
+}
+
+function setupPackDetailsModal() {
+  const modal = document.getElementById("packDetailsModal");
+  const open = document.getElementById("packDetailsOpen");
+  if (!modal || !open) return;
+  open.addEventListener("click", () => setModalState(modal, true));
+  document.querySelectorAll("[data-close-pack-details]").forEach(element => {
+    element.addEventListener("click", () => setModalState(modal, false));
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && modal.classList.contains("is-open")) setModalState(modal, false);
   });
 }
 
@@ -871,6 +969,7 @@ function setupWhatsAssistant() {
 
   /* Auto messages - balloon only when closed */
   function scheduleNextAutoMessage() {
+    if (!canShowAutoInterruption() || sessionStorage.getItem(IA_ENGAGED_KEY) === "1") return;
     clearTimeout(waRepeatTimer);
     waRepeatTimer = setTimeout(() => {
       waRepeatTimer = null;
@@ -879,6 +978,7 @@ function setupWhatsAssistant() {
   }
 
   function showNextAutoMessage() {
+    if (!canShowAutoInterruption() || sessionStorage.getItem(IA_ENGAGED_KEY) === "1") return;
     if (document.hidden || chatOpen || hasActiveInterruption()) {
       scheduleNextAutoMessage();
       return;
@@ -895,10 +995,11 @@ function setupWhatsAssistant() {
     if (inputWrap) inputWrap.style.display = "none";
     if (floatWrap) floatWrap.style.display = "none";
     assistant.classList.add("is-visible");
+    recordAutoInterruption();
     waMessageIndex++;
     waAutoHideTimer = setTimeout(() => {
       assistant.classList.remove("is-visible");
-      scheduleNextAutoMessage();
+      if (canShowAutoInterruption()) scheduleNextAutoMessage();
     }, 12000);
   }
 
@@ -907,6 +1008,7 @@ function setupWhatsAssistant() {
     trigger.addEventListener("click", e => {
       e.preventDefault();
       chatOpen = true;
+      sessionStorage.setItem(IA_ENGAGED_KEY, "1");
       assistant.classList.remove("is-visible");
       clearTimeout(waAutoHideTimer); clearTimeout(waRepeatTimer);
       setTimeout(() => {
@@ -924,7 +1026,6 @@ function setupWhatsAssistant() {
   close.addEventListener("click", () => {
     chatOpen = false;
     assistant.classList.remove("is-visible");
-    scheduleNextAutoMessage();
   });
 
   send.addEventListener("click", () => {
@@ -975,6 +1076,18 @@ function whatsappUrl(message = "") {
   return `https://wa.me/${APP.whatsapp}${query}`;
 }
 
+function getAutoInterruptionCount() {
+  return Number(sessionStorage.getItem(AUTO_INTERRUPTION_COUNT_KEY)) || 0;
+}
+
+function canShowAutoInterruption() {
+  return getAutoInterruptionCount() < AUTO_INTERRUPTION_LIMIT;
+}
+
+function recordAutoInterruption() {
+  sessionStorage.setItem(AUTO_INTERRUPTION_COUNT_KEY, String(getAutoInterruptionCount() + 1));
+}
+
 function randomAutoDelay() {
   return Math.floor(AUTO_DELAY_MIN + Math.random() * (AUTO_DELAY_MAX - AUTO_DELAY_MIN + 1));
 }
@@ -990,9 +1103,48 @@ function hasActiveInterruption() {
 
 function setModalState(modal, isOpen) {
   if (!modal) return;
+  const wasOpen = modal.classList.contains("is-open");
+
+  if (isOpen && !wasOpen) {
+    const returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const trapFocus = event => {
+      if (event.key !== "Tab") return;
+      const focusable = [...modal.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), iframe, [tabindex]:not([tabindex="-1"])')]
+        .filter(element => element.getClientRects().length > 0);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && (document.activeElement === first || !modal.contains(document.activeElement))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    modalFocusState.set(modal, { returnFocus, trapFocus });
+    modal.addEventListener("keydown", trapFocus);
+  }
+
   modal.classList.toggle("is-open", isOpen);
   modal.setAttribute("aria-hidden", String(!isOpen));
   document.body.style.overflow = document.querySelector(".modal.is-open") ? "hidden" : "";
+
+  if (isOpen && !wasOpen) {
+    window.requestAnimationFrame(() => {
+      const first = modal.querySelector('button:not([disabled]), a[href], input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+      first?.focus();
+    });
+  } else if (!isOpen && wasOpen) {
+    const state = modalFocusState.get(modal);
+    if (state) {
+      modal.removeEventListener("keydown", state.trapFocus);
+      modalFocusState.delete(modal);
+      window.requestAnimationFrame(() => {
+        if (state.returnFocus?.isConnected) state.returnFocus.focus();
+      });
+    }
+  }
 }
 
 function whatsLink(context) {
