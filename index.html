@@ -20,7 +20,12 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 
-<body>
+<body
+  data-whatsapp="5511950818317"
+  data-instagram="https://www.instagram.com/lil_drew_jaxon?igsh=MTAxaGxsZXdnMjhvYg%3D%3D&amp;utm_source=qr"
+  data-x="https://x.com/mauriciodg122?s=11"
+  data-privacy="https://privacy.com.br/@Garotinho43"
+>
   <div class="square-bg" aria-hidden="true"></div>
 
   <header class="site-header" id="siteHeader">
@@ -48,11 +53,15 @@
     <a href="#previas" class="rail-btn">fotos</a>
     <a href="#depoimentos" class="rail-btn">feed</a>
     <a href="#top" class="rail-btn rail-top" aria-label="Voltar ao topo">↑</a>
+    <a class="rail-btn rail-whatsapp" href="#" data-chat-trigger data-channel="whatsapp" data-message="Oi Mauricio, quero saber mais sobre os packs de conteúdo" aria-label="Abrir assistente do WhatsApp">
+      <span>✦</span>
+      <b>WhatsApp</b>
+    </a>
   </aside>
 
   <div class="purchase-toasts" id="purchaseToasts" aria-live="polite"></div>
 
-  <a class="whatsapp-float" href="https://wa.me/5511950818317?text=Oi%20Mauricio%2C%20quero%20saber%20mais%20sobre%20os%20packs%20de%20conte%C3%BAdo" target="_blank" rel="noopener" aria-label="Chamar no WhatsApp">
+  <a class="whatsapp-float" href="#" data-chat-trigger data-channel="whatsapp" data-message="Oi Mauricio, quero saber mais sobre os packs de conteúdo" target="_blank" rel="noopener" aria-label="Chamar no WhatsApp">
     <span>✦</span>
     <b>WhatsApp</b>
   </a>
@@ -71,15 +80,18 @@
       <div class="wa-chat-options" id="waOptions"></div>
       <div class="wa-chat-input">
         <input id="waInput" type="text" placeholder="Digite sua mensagem..." maxlength="200" autocomplete="off" />
-        <button id="waSend" type="button">➤</button>
+        <button id="waSend" type="button" aria-label="Enviar mensagem">➤</button>
       </div>
     </div>
   </div>
 
   <main id="top" class="page-shell">
-    <a class="featured-link" href="https://wa.me/5511950818317?text=Oi%20Mauricio%2C%20quero%20o%20pack%20do%20momento!" target="_blank" rel="noopener">
+    <a class="featured-link" href="#" data-channel="whatsapp" data-message="Oi Mauricio, quero o pack do momento!" target="_blank" rel="noopener" aria-label="Ver o pack do momento no WhatsApp">
       <span class="featured-icon">◆</span>
-      <span class="featured-label">Pack do momento</span>
+      <span class="featured-copy">
+        <strong class="featured-label">Pack do momento</strong>
+        <small>Acessar pelo WhatsApp</small>
+      </span>
       <span class="featured-arrow">→</span>
     </a>
 
@@ -118,19 +130,19 @@
       </div>
 
       <div id="links" class="social-board" aria-label="Links oficiais">
-        <a href="https://privacy.com.br/@Garotinho43" target="_blank" rel="noopener">
+        <a href="#" data-channel="privacy" target="_blank" rel="noopener">
           <span>Privacy</span>
           <small>conteúdo exclusivo para assinantes</small>
         </a>
-        <a href="https://www.instagram.com/lil_drew_jaxon?igsh=MTAxaGxsZXdnMjhvYg%3D%3D&utm_source=qr" target="_blank" rel="noopener">
+        <a href="#" data-channel="instagram" target="_blank" rel="noopener">
           <span>Instagram</span>
           <small>@lil_drew_jaxon</small>
         </a>
-        <a href="https://x.com/mauriciodg122?s=11" target="_blank" rel="noopener">
+        <a href="#" data-channel="x" target="_blank" rel="noopener">
           <span>X / Twitter</span>
           <small>@mauriciodg122</small>
         </a>
-        <a href="https://wa.me/5511950818317?text=Oi%20Mauricio%2C%20quero%20saber%20mais%20sobre%20os%20packs%20de%20conte%C3%BAdo" target="_blank" rel="noopener">
+        <a href="#" data-channel="whatsapp" data-message="Oi Mauricio, quero saber mais sobre os packs de conteúdo" target="_blank" rel="noopener">
           <span>Packs</span>
           <small>chamar no WhatsApp</small>
         </a>
@@ -144,7 +156,7 @@
         <span class="packs-banner-tag">+18</span>
         <h2>Conteúdo exclusivo</h2>
         <p>Fotos, vídeos, gozadas e muito mais no privado. Vem ver o que eu preparei pra você.</p>
-        <a class="packs-banner-cta" href="https://wa.me/5511950818317?text=Oi%20Mauricio%2C%20quero%20ver%20os%20packs!" target="_blank" rel="noopener">Quero ver agora →</a>
+        <a class="packs-banner-cta" href="#" data-channel="whatsapp" data-message="Oi Mauricio, quero ver os packs!" target="_blank" rel="noopener">Quero ver agora →</a>
       </div>
     </section>
 
@@ -214,7 +226,7 @@
 
         <div class="modal-actions">
           <a id="modalWhats" href="#" target="_blank" rel="noopener">Saber mais no WhatsApp</a>
-          <a id="modalInstagram" href="https://www.instagram.com/lil_drew_jaxon?igsh=MTAxaGxsZXdnMjhvYg%3D%3D&utm_source=qr" target="_blank" rel="noopener">Instagram</a>
+          <a id="modalInstagram" href="#" data-channel="instagram" target="_blank" rel="noopener">Instagram</a>
           <button id="modalShare" type="button">Compartilhar</button>
         </div>
       </div>
@@ -248,24 +260,6 @@
     <div class="cookie-actions">
       <button id="cookieReject" type="button">Recusar</button>
       <button id="cookieAccept" type="button">Aceitar</button>
-    </div>
-  </div>
-
-  <div class="modal" id="packsModal" aria-hidden="true">
-    <div class="modal-backdrop" data-close-packs></div>
-    <div class="packs-box" role="dialog" aria-modal="true" aria-label="Sobre os packs">
-      <button class="modal-close" type="button" data-close-packs aria-label="Fechar">×</button>
-      <div class="packs-box-header">
-        <span class="packs-box-icon" id="packsIcon">✦</span>
-        <h2 id="packsTitle">Privacy oficial</h2>
-      </div>
-      <p id="packsText">Conteúdo exclusivo para assinantes do Privacy.</p>
-      <div class="packs-extended" id="packsExtended"></div>
-      <div class="packs-nav">
-        <button id="packsPrev" type="button" aria-label="Mensagem anterior">‹ Anterior</button>
-        <span id="packsCounter">1 / 3</span>
-        <button id="packsNext" type="button" aria-label="Próxima mensagem">Próximo ›</button>
-      </div>
     </div>
   </div>
 

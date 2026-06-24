@@ -3,12 +3,16 @@
    Criado por Anderson Honorato
    ====================================================== */
 
-const APP = {
-  whatsapp: "5511950818317",
-  instagram: "https://www.instagram.com/lil_drew_jaxon?igsh=MTAxaGxsZXdnMjhvYg%3D%3D&utm_source=qr",
-  x: "https://x.com/mauriciodg122?s=11",
-  privacy: "https://privacy.com.br/@Garotinho43"
-};
+const APP = Object.freeze({
+  whatsapp: document.body.dataset.whatsapp,
+  instagram: document.body.dataset.instagram,
+  x: document.body.dataset.x,
+  privacy: document.body.dataset.privacy
+});
+
+const AUTO_DELAY_MIN = 5 * 60 * 1000;
+const AUTO_DELAY_MAX = 10 * 60 * 1000;
+const USER_COMMENTS_KEY = "mdb_user_comments_v1";
 
 const PREVIEWS = [
   {
@@ -66,7 +70,6 @@ const WA_MESSAGES = [
 
 const THEMES = ["white", "offwhite", "gray", "black"];
 let modalIndex = 0;
-let waClosedThisSession = false;
 let waMessageIndex = 0;
 let waAutoHideTimer = null;
 let waRepeatTimer = null;
@@ -126,19 +129,19 @@ function randomName(seed) {
 const t0 = randomName(1), t1 = randomName(2), t2 = randomName(3), t3 = randomName(4);
 
 const TESTIMONIALS = [
-  { name: t0.name, avatarClass: t0.avClass, avatarInitial: t0.initial, photo: "", stars: 5, time: "há 2 dias",
+  { id: "testimonial-1", name: t0.name, avatarClass: t0.avClass, avatarInitial: t0.initial, photo: "", stars: 5, time: "há 2 dias",
     body: "Mano, que conteúdo insano! Comprei o pack completo e recebi na hora. O Mauricio é muito gente boa e o material é de primeira. 🔥",
     likes: 24, comments: 8,
     reply: "Valeu demais! Fico feliz que curtiu o pack. Tamo junto pra mais! 🤝" },
-  { name: t1.name, avatarClass: t1.avClass, avatarInitial: t1.initial, photo: "", stars: 5, time: "há 5 dias",
+  { id: "testimonial-2", name: t1.name, avatarClass: t1.avClass, avatarInitial: t1.initial, photo: "", stars: 5, time: "há 5 dias",
     body: "Já comprei 3 packs diferentes e todos entregaram muito! Conteúdo variado, bem filmado e o Mauricio manda super bem. 👅",
     likes: 18, comments: 5,
     reply: "Você é fiel hein! Obrigado pela confiança, logo mais tem novidade saindo... 👀" },
-  { name: t2.name, avatarClass: t2.avClass, avatarInitial: t2.initial, photo: "", stars: 5, time: "há 1 semana",
+  { id: "testimonial-3", name: t2.name, avatarClass: t2.avClass, avatarInitial: t2.initial, photo: "", stars: 5, time: "há 1 semana",
     body: "Sem palavras pro tanto de conteúdo gostoso. O magrinho é pauzudo mesmo e entrega tudo que promete. Nota mil! 🍑",
     likes: 31, comments: 12,
     reply: "Hahaha fico lisonjeado! O sigilo e a qualidade são prioridade aqui. Volte sempre! 😈" },
-  { name: t3.name, avatarClass: t3.avClass, avatarInitial: t3.initial, photo: "", stars: 5, time: "há 2 semanas",
+  { id: "testimonial-4", name: t3.name, avatarClass: t3.avClass, avatarInitial: t3.initial, photo: "", stars: 5, time: "há 2 semanas",
     body: "Comprei o pack VIP e me arrependi... de não ter comprado antes! Conteúdo exclusivo, bem produzido. 💦",
     likes: 15, comments: 4,
     reply: "Quase me assustou no começo kkkk. Que bom que gostou! O próximo já tá no forno... 🔥" }
@@ -170,77 +173,6 @@ const COMMENTS_DATA = (() => {
   });
 })();
 
-// ═══ SPAWN DE DEPOIMENTOS ═══
-const TESTIMONIAL_MESSAGES = [
-  "Mano, que conteúdo insano! Comprei o pack completo e recebi na hora. O Mauricio é muito gente boa e o material é de primeira. 🔥",
-  "Já comprei 3 packs diferentes e todos entregaram muito! Conteúdo variado, bem filmado. 👅",
-  "Sem palavras pro tanto de conteúdo gostoso. O magrinho é pauzudo mesmo. Nota mil! 🍑",
-  "Comprei o pack VIP e me arrependi... de não ter comprado antes! 💦",
-  "Acabei de receber o pack e já tô impressionado. Qualidade absurda! 🤤",
-  "Mauricio não decepciona nunca. Cada pack é melhor que o outro. 🔥👑",
-  "Conteúdo incrível, atendimento rápido e sigilo total. Já quero o próximo! 🍆",
-  "Melhor pack que já adquiri até hoje. O magrinho manda bem demais. 😈",
-  "Fiquei surpreso com a qualidade. Bem produzido, entrega rápida. ✨",
-  "Sigo o Mauricio há meses e cada pack supera o anterior. 🌟",
-  "Nunca vi conteúdo tão bem feito. Parabéns, Mauricio! Já sou fã. 💛",
-  "Comprei, recebi na hora e fiquei maluco. Vale cada centavo. 🔥🍑"
-];
-let usedMessages = new Set();
-let usedNames = new Set();
-let testimonialSpawnTimer = null;
-let recentBuyers = [];
-
-function getRandomUnusedMessage() {
-  const available = TESTIMONIAL_MESSAGES.filter((_, i) => !usedMessages.has(i));
-  if (!available.length) { usedMessages.clear(); return TESTIMONIAL_MESSAGES[Math.floor(Math.random() * TESTIMONIAL_MESSAGES.length)]; }
-  const idx = TESTIMONIAL_MESSAGES.indexOf(available[Math.floor(Math.random() * available.length)]);
-  usedMessages.add(idx);
-  return TESTIMONIAL_MESSAGES[idx];
-}
-
-function getRandomUnusedName() {
-  const available = RANDOM_NAMES.filter(n => !usedNames.has(n.name));
-  if (!available.length) { usedNames.clear(); return RANDOM_NAMES[Math.floor(Math.random() * RANDOM_NAMES.length)]; }
-  const pick = available[Math.floor(Math.random() * available.length)];
-  usedNames.add(pick.name);
-  return pick;
-}
-
-function spawnTestimonial() {
-  const grid = document.getElementById("testimonialsGrid");
-  if (!grid) return;
-
-  let nameData;
-  if (recentBuyers.length && Math.random() > .4) {
-    nameData = recentBuyers.shift();
-  } else {
-    nameData = getRandomUnusedName();
-  }
-  const msg = getRandomUnusedMessage();
-  const stars = Math.random() > .25 ? 5 : 4;
-
-  const card = document.createElement("article");
-  card.className = "testimonial-card is-new";
-  card.innerHTML = `
-    <div class="testimonial-header">
-      <div class="testimonial-avatar ${nameData.avClass}">
-        <span class="avatar-fallback">${nameData.initial}</span>
-      </div>
-      <div>
-        <strong>${nameData.name}</strong>
-        <div class="stars">${"★".repeat(stars)}</div>
-      </div>
-      <span class="testimonial-time">agora mesmo</span>
-    </div>
-    <p class="testimonial-body">${msg}</p>
-  `;
-  grid.insertBefore(card, grid.firstChild);
-  setTimeout(() => card.classList.remove("is-new"), 500);
-  const cards = grid.querySelectorAll(".testimonial-card");
-  if (cards.length > 6) cards[cards.length - 1].remove();
-  updateSectionScore();
-}
-
 function updateSectionScore() {
   const grid = document.getElementById("testimonialsGrid");
   const scoreEl = document.getElementById("sectionScore");
@@ -252,11 +184,6 @@ function updateSectionScore() {
   scoreEl.textContent = `★ ${(total / cards.length).toFixed(1)}`;
 }
 
-function startTestimonialSpawner() {
-  if (testimonialSpawnTimer) return;
-  testimonialSpawnTimer = setInterval(spawnTestimonial, 65000);
-}
-
 // ═══ NOTIFICAÇÕES FLUTUANTES ═══
 const PACK_NAMES = ["Pack VIP", "Pack Completo", "Pack Fotos", "Pack Vídeos", "Pack Premium", "Pack Proibidão", "Pack Exclusivo"];
 const NOTIFY_TYPES = ["purchase", "purchase", "fan", "fan", "comment", "like"];
@@ -265,12 +192,20 @@ let notificationsDisabled = localStorage.getItem("mdb_notify_off") === "1";
 
 function startPurchaseNotifications() {
   if (notificationsDisabled || purchaseNotifyTimer) return;
-  spawnPurchaseNotify();
-  purchaseNotifyTimer = setInterval(spawnPurchaseNotify, 28000);
+  schedulePurchaseNotification();
+}
+
+function schedulePurchaseNotification() {
+  if (notificationsDisabled) return;
+  clearTimeout(purchaseNotifyTimer);
+  purchaseNotifyTimer = setTimeout(() => {
+    purchaseNotifyTimer = null;
+    spawnPurchaseNotify();
+  }, randomAutoDelay());
 }
 
 function stopPurchaseNotifications() {
-  clearInterval(purchaseNotifyTimer);
+  clearTimeout(purchaseNotifyTimer);
   purchaseNotifyTimer = null;
   notificationsDisabled = true;
   localStorage.setItem("mdb_notify_off", "1");
@@ -279,7 +214,11 @@ function stopPurchaseNotifications() {
 
 function spawnPurchaseNotify() {
   const container = document.getElementById("purchaseToasts");
-  if (!container) return;
+  if (!container || notificationsDisabled) return;
+  if (document.hidden || hasActiveInterruption()) {
+    schedulePurchaseNotification();
+    return;
+  }
 
   const nameData = RANDOM_NAMES[Math.floor(Math.random() * RANDOM_NAMES.length)];
   const type = NOTIFY_TYPES[Math.floor(Math.random() * NOTIFY_TYPES.length)];
@@ -289,7 +228,6 @@ function spawnPurchaseNotify() {
   switch (type) {
     case "purchase":
       icon = "●"; text = `Comprou ${PACK_NAMES[Math.floor(Math.random() * PACK_NAMES.length)]} · há ${mins} min`;
-      if (recentBuyers.length < 10) recentBuyers.push(nameData);
       break;
     case "fan":
       icon = "♥"; text = `Começou a seguir · há ${mins} min`;
@@ -322,10 +260,10 @@ function spawnPurchaseNotify() {
   });
 
   container.appendChild(el);
-  setTimeout(() => { if (el.parentNode) el.remove(); }, 7600);
-
-  const all = container.querySelectorAll(".purchase-notify");
-  if (all.length > 3) all[0].remove();
+  setTimeout(() => {
+    if (el.parentNode) el.remove();
+    schedulePurchaseNotification();
+  }, 7600);
 }
 
 // ═══ RENDER DEPOIMENTOS ═══
@@ -333,37 +271,36 @@ function renderTestimonials() {
   const grid = document.getElementById("testimonialsGrid");
   if (!grid) return;
 
-  TESTIMONIALS.forEach(t => {
-    usedMessages.add(TESTIMONIAL_MESSAGES.indexOf(t.body));
-    usedNames.add(t.name);
-  });
-
-  grid.innerHTML = TESTIMONIALS.map((t, index) => `
-    <article class="testimonial-card">
+  const userComments = loadUserComments();
+  grid.innerHTML = TESTIMONIALS.map(t => {
+    const localCount = (userComments[t.id] || []).length;
+    return `
+    <article class="testimonial-card" data-testimonial-id="${t.id}">
       <div class="testimonial-header">
         <div class="testimonial-avatar ${t.avatarClass}">
-          <span class="avatar-fallback">${t.avatarInitial}</span>
+          <span class="avatar-fallback">${escapeHtml(t.avatarInitial)}</span>
         </div>
         <div>
-          <strong>${t.name}</strong>
+          <strong>${escapeHtml(t.name)}</strong>
           <div class="stars">${"★".repeat(t.stars)}</div>
         </div>
-        <span class="testimonial-time">${t.time}</span>
+        <span class="testimonial-time">${escapeHtml(t.time)}</span>
       </div>
-      <p class="testimonial-body">${t.body}</p>
+      <p class="testimonial-body">${escapeHtml(t.body)}</p>
       <div class="testimonial-actions">
         <button class="like-btn" type="button">♥ <span>${t.likes}</span></button>
-        <button class="comment-btn" type="button">◈ ${t.comments} comentários</button>
+        <button class="comment-btn" type="button" data-testimonial-id="${t.id}">◈ <span class="comment-count">${t.comments + localCount}</span> comentários</button>
       </div>
       <div class="testimonial-reply">
         <div class="reply-avatar">D</div>
         <div>
           <strong>Mauricio Drew</strong>
-          <p>${t.reply}</p>
+          <p>${escapeHtml(t.reply)}</p>
         </div>
       </div>
     </article>
-  `).join("");
+  `;
+  }).join("");
 
   grid.querySelectorAll(".like-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -373,34 +310,73 @@ function renderTestimonials() {
     });
   });
   grid.querySelectorAll(".comment-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const card = btn.closest(".testimonial-card");
-      const allCards = [...grid.querySelectorAll(".testimonial-card")];
-      openCommentsModal(allCards.indexOf(card), card);
-    });
+    btn.addEventListener("click", () => openCommentsModal(btn.dataset.testimonialId));
   });
 
   updateSectionScore();
-  initCoverCounters();
-  startTestimonialSpawner();
 }
 
-function extractTestimonialFromCard(card) {
-  if (!card) return null;
-  const name = card.querySelector(".testimonial-header strong")?.textContent || "";
-  const avatar = card.querySelector(".testimonial-avatar");
-  const avClass = avatar ? [...avatar.classList].find(c => c.startsWith("av-")) || "" : "";
-  const initial = card.querySelector(".avatar-fallback")?.textContent || name[0];
-  const body = card.querySelector(".testimonial-body")?.textContent || "";
-  const time = card.querySelector(".testimonial-time")?.textContent || "";
-  const starsCount = (card.querySelector(".stars")?.textContent.match(/★/g) || []).length;
-  const likesText = card.querySelector(".like-btn span")?.textContent || "0";
-  return { name, avatarClass: avClass, avatarInitial: initial, photo: "", stars: starsCount || 5, time, body, likes: Number(likesText), comments: 0 };
+function loadUserComments() {
+  try {
+    const parsed = JSON.parse(storage.get(USER_COMMENTS_KEY) || "{}");
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (_) {
+    return {};
+  }
 }
 
-function openCommentsModal(index, card) {
-  const testimonial = TESTIMONIALS[index] || extractTestimonialFromCard(card);
+function saveUserComments(comments) {
+  storage.set(USER_COMMENTS_KEY, JSON.stringify(comments));
+}
+
+function createCommentElement(comment) {
+  const item = document.createElement("div");
+  item.className = "comment-item";
+
+  const avatar = document.createElement("div");
+  avatar.className = `comment-avatar ${comment.avClass || "av-user"}`;
+  avatar.textContent = comment.initial || "?";
+
+  const content = document.createElement("div");
+  const header = document.createElement("div");
+  header.className = "comment-item-header";
+  const name = document.createElement("strong");
+  name.textContent = comment.name;
+  const stars = document.createElement("span");
+  stars.className = "stars";
+  stars.textContent = "★".repeat(comment.stars || 5);
+  header.append(name, stars);
+
+  const message = document.createElement("p");
+  message.textContent = comment.text;
+
+  const footer = document.createElement("div");
+  footer.className = "comment-item-footer";
+  const time = document.createElement("span");
+  time.className = "comment-time";
+  time.textContent = comment.time || "agora";
+  const like = document.createElement("button");
+  like.className = "comment-like";
+  like.type = "button";
+  const likeCount = document.createElement("span");
+  likeCount.textContent = Number(comment.likes) || 0;
+  like.append("♥ ", likeCount);
+  like.addEventListener("click", () => {
+    const liked = like.classList.toggle("liked");
+    likeCount.textContent = Number(likeCount.textContent) + (liked ? 1 : -1);
+  });
+  footer.append(time, like);
+  content.append(header, message, footer);
+  item.append(avatar, content);
+  return item;
+}
+
+let activeTestimonialId = null;
+
+function openCommentsModal(testimonialId) {
+  const testimonial = TESTIMONIALS.find(item => item.id === testimonialId);
   if (!testimonial) return;
+  activeTestimonialId = testimonial.id;
   const list = document.getElementById("commentsList");
   const modal = document.getElementById("commentsModal");
   const original = document.getElementById("commentsOriginal");
@@ -410,67 +386,60 @@ function openCommentsModal(index, card) {
 
   const allStars = COMMENTS_DATA.map(c => c.stars);
   const avg = (allStars.reduce((a, b) => a + b, 0) / allStars.length).toFixed(1);
-  score.innerHTML = `★ ${avg} · 14 avaliações`;
+  score.textContent = `★ ${avg} · ${COMMENTS_DATA.length} avaliações`;
 
   original.innerHTML = `
     <div class="testimonial-header">
       <div class="testimonial-avatar ${testimonial.avatarClass}">
-        <span class="avatar-fallback">${testimonial.avatarInitial}</span>
+        <span class="avatar-fallback">${escapeHtml(testimonial.avatarInitial)}</span>
       </div>
-      <div><strong>${testimonial.name}</strong><div class="stars">${"★".repeat(testimonial.stars || 5)}</div></div>
-      <span class="testimonial-time">${testimonial.time}</span>
+      <div><strong>${escapeHtml(testimonial.name)}</strong><div class="stars">${"★".repeat(testimonial.stars || 5)}</div></div>
+      <span class="testimonial-time">${escapeHtml(testimonial.time)}</span>
     </div>
-    <p class="testimonial-body">${testimonial.body}</p>
+    <p class="testimonial-body">${escapeHtml(testimonial.body)}</p>
     <div class="testimonial-actions"><span style="font-size:.65rem;color:var(--muted);">♥ ${testimonial.likes || 0} curtidas</span></div>
   `;
 
-  const shuffled = [...COMMENTS_DATA].sort(() => Math.random() - .5).slice(0, 7 + Math.floor(Math.random() * 6));
-  count.textContent = `${shuffled.length} comentários`;
-
-  list.innerHTML = shuffled.map(c => `
-    <div class="comment-item">
-      <div class="comment-avatar ${c.avClass}">${c.initial}</div>
-      <div>
-        <div class="comment-item-header"><strong>${c.name}</strong><span class="stars">${"★".repeat(c.stars)}</span></div>
-        <p>${c.text}</p>
-        <div class="comment-item-footer">
-          <span class="comment-time">${c.time}</span>
-          <button class="comment-like" type="button">♥ <span>${c.likes}</span></button>
-        </div>
-      </div>
-    </div>
-  `).join("");
-
-  list.querySelectorAll(".comment-like").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const span = btn.querySelector("span");
-      if (btn.classList.contains("liked")) { btn.classList.remove("liked"); span.textContent = Number(span.textContent) - 1; }
-      else { btn.classList.add("liked"); span.textContent = Number(span.textContent) + 1; }
-    });
-  });
-
-  modal.classList.add("is-open");
-  modal.setAttribute("aria-hidden", "false");
-  document.body.style.overflow = "hidden";
+  const testimonialIndex = TESTIMONIALS.findIndex(item => item.id === testimonial.id);
+  const baseComments = Array.from({ length: testimonial.comments }, (_, offset) => COMMENTS_DATA[(testimonialIndex * 3 + offset) % COMMENTS_DATA.length]);
+  const localComments = loadUserComments()[testimonial.id] || [];
+  const comments = [...localComments, ...baseComments];
+  count.textContent = `${comments.length} comentários`;
+  list.replaceChildren(...comments.map(createCommentElement));
+  setModalState(modal, true);
 }
 
 function setupCommentsModal() {
   const modal = document.getElementById("commentsModal");
   if (!modal) return;
-  document.querySelectorAll("[data-close-comments]").forEach(el => el.addEventListener("click", () => {
-    modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = "";
-  }));
+  document.querySelectorAll("[data-close-comments]").forEach(el => el.addEventListener("click", () => setModalState(modal, false)));
   const submit = document.getElementById("commentSubmit");
   if (submit) submit.addEventListener("click", () => {
     const name = document.getElementById("commentName").value.trim();
     const text = document.getElementById("commentText").value.trim();
     if (!name || !text) { showToast("Preencha nome e comentário"); return; }
+    if (!activeTestimonialId) { showToast("Abra um depoimento antes de comentar"); return; }
+    const comments = loadUserComments();
+    const ownComments = comments[activeTestimonialId] || [];
+    ownComments.unshift({
+      name,
+      text,
+      initial: name.charAt(0).toUpperCase(),
+      avClass: "av-user",
+      stars: 5,
+      time: "agora",
+      likes: 0
+    });
+    comments[activeTestimonialId] = ownComments.slice(0, 20);
+    saveUserComments(comments);
     document.getElementById("commentName").value = "";
     document.getElementById("commentText").value = "";
-    showToast("Agradecemos pelo seu comentario!");
+    renderTestimonials();
+    openCommentsModal(activeTestimonialId);
+    showToast("Comentário salvo neste dispositivo!");
   });
   document.addEventListener("keydown", event => {
-    if (event.key === "Escape" && modal.classList.contains("is-open")) { modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }
+    if (event.key === "Escape" && modal.classList.contains("is-open")) setModalState(modal, false);
   });
 }
 
@@ -488,20 +457,17 @@ function setupDevModal() {
   const modal = document.getElementById("hubModal");
   if (!modal) return;
 
-  function openDev(e) { e.preventDefault(); modal.classList.add("is-open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; }
-  document.querySelector(".brand").addEventListener("click", openDev);
+  function openDev(e) { e.preventDefault(); setModalState(modal, true); }
   document.getElementById("devLink").addEventListener("click", openDev);
 
-  document.querySelectorAll("[data-close-hub]").forEach(el => el.addEventListener("click", () => {
-    modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = "";
-  }));
+  document.querySelectorAll("[data-close-hub]").forEach(el => el.addEventListener("click", () => setModalState(modal, false)));
 
   document.getElementById("devCopyContact").addEventListener("click", async () => {
     try { await navigator.clipboard.writeText("https://andersonhonorato.github.io/meu-portfolio/index.html"); showToast("Contato copiado!"); } catch (_) { showToast("Erro ao copiar"); }
   });
 
   document.addEventListener("keydown", event => {
-    if (event.key === "Escape" && modal.classList.contains("is-open")) { modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }
+    if (event.key === "Escape" && modal.classList.contains("is-open")) setModalState(modal, false);
   });
 }
 
@@ -515,17 +481,17 @@ function setupFaqModal() {
   `).join("");
   list.querySelectorAll(".faq-q").forEach(btn => btn.addEventListener("click", () => btn.parentElement.classList.toggle("is-open")));
 
-  document.getElementById("faqLink").addEventListener("click", e => { e.preventDefault(); modal.classList.add("is-open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; });
-  document.querySelectorAll("[data-close-faq]").forEach(el => el.addEventListener("click", () => { modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }));
-  document.addEventListener("keydown", event => { if (event.key === "Escape" && modal.classList.contains("is-open")) { modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; } });
+  document.getElementById("faqLink").addEventListener("click", e => { e.preventDefault(); setModalState(modal, true); });
+  document.querySelectorAll("[data-close-faq]").forEach(el => el.addEventListener("click", () => setModalState(modal, false)));
+  document.addEventListener("keydown", event => { if (event.key === "Escape" && modal.classList.contains("is-open")) setModalState(modal, false); });
 }
 
 function setupTermsModal() {
   const modal = document.getElementById("termsModal");
   if (!modal) return;
-  document.getElementById("termsLink").addEventListener("click", e => { e.preventDefault(); modal.classList.add("is-open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; });
-  document.querySelectorAll("[data-close-terms]").forEach(el => el.addEventListener("click", () => { modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }));
-  document.addEventListener("keydown", event => { if (event.key === "Escape" && modal.classList.contains("is-open")) { modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; } });
+  document.getElementById("termsLink").addEventListener("click", e => { e.preventDefault(); setModalState(modal, true); });
+  document.querySelectorAll("[data-close-terms]").forEach(el => el.addEventListener("click", () => setModalState(modal, false)));
+  document.addEventListener("keydown", event => { if (event.key === "Escape" && modal.classList.contains("is-open")) setModalState(modal, false); });
 }
 
 // ═══ CONTADORES DA CAPA ═══
@@ -556,44 +522,10 @@ function updateCoverStats(el, fans, online) {
   el.innerHTML = `♥ ${fans.toLocaleString("pt-BR")}+ fãs · <span class="cdot"></span> ${online} online`;
 }
 
-// ═══ PACKS MODAL ═══
-const PACKS_INFO = [
-  { icon: "✦", title: "Privacy oficial", summary: "Conteúdo exclusivo para assinantes do Privacy.",
-    extended: "No meu Privacy você encontra o conteúdo mais completo e sem censura. Fotos e vídeos que eu não posto em nenhum outro lugar, tudo com qualidade e atualizado com frequência. Assinando, você tem acesso imediato a todo o acervo — uma experiência completa e exclusiva, feita para quem quer ver tudo sem limites.",
-    link: APP.privacy, linkLabel: "Acessar Privacy" },
-  { icon: "♡", title: "Veja uma prévia", summary: "Clique nos cards abaixo para ver prévias dos meus conteúdos.",
-    extended: "Abaixo na seção 'Um gostinho do que te espera' você confere fotos e prévias selecionadas. Mas isso é só a ponta do iceberg — o conteúdo completo vai muito além. Os packs são recheados de material inédito, feito com cuidado e muito tesão. Cada prévia é um convite para algo maior.",
-    link: "#previas", linkLabel: "Ver prévias" },
-  { icon: "↗", title: "Fale comigo", summary: "Clique no botão de contato para combinar valores e outras informações.",
-    extended: "Quer saber valores, combinar packs personalizados ou tirar dúvidas? Me chama no WhatsApp que a gente conversa sem compromisso. Eu mesmo respondo e explico todos os detalhes. Pagamento fácil, entrega rápida e total sigilo. Tudo no privado, do jeito que você prefere.",
-    link: `https://wa.me/${APP.whatsapp}?text=Oi%20Mauricio%2C%20quero%20saber%20mais%20sobre%20os%20packs`, linkLabel: "Chamar no WhatsApp" }
-];
-let packsIndex = 0;
-
-function setupPacksModal() {
-  const modal = document.getElementById("packsModal");
-  if (!modal) return;
-  document.querySelectorAll(".mini-grid article").forEach((article, index) => article.addEventListener("click", () => openPacksModal(index)));
-  document.getElementById("packsPrev").addEventListener("click", () => { packsIndex = (packsIndex - 1 + PACKS_INFO.length) % PACKS_INFO.length; updatePacksContent(packsIndex); });
-  document.getElementById("packsNext").addEventListener("click", () => { packsIndex = (packsIndex + 1) % PACKS_INFO.length; updatePacksContent(packsIndex); });
-  document.querySelectorAll("[data-close-packs]").forEach(el => el.addEventListener("click", () => { modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }));
-  document.addEventListener("keydown", event => { if (event.key === "Escape" && modal.classList.contains("is-open")) { modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; } });
-}
-
-function openPacksModal(index) { packsIndex = index; updatePacksContent(index); const m = document.getElementById("packsModal"); m.classList.add("is-open"); m.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; }
-
-function updatePacksContent(index) {
-  const item = PACKS_INFO[index];
-  document.getElementById("packsIcon").textContent = item.icon;
-  document.getElementById("packsTitle").textContent = item.title;
-  document.getElementById("packsText").textContent = item.summary;
-  document.getElementById("packsExtended").innerHTML = `<p>${item.extended}</p><a href="${item.link}" target="_blank" rel="noopener" style="display:inline-flex;margin-top:12px;padding:8px 18px;border-radius:999px;background:var(--ink);color:var(--bg);font-size:.72rem;font-weight:900;">${item.linkLabel}</a>`;
-  document.getElementById("packsCounter").textContent = `${index + 1} / ${PACKS_INFO.length}`;
-}
-
 // ═══ DEV MODAL ═══
 // ═══ DOM READY ═══
 document.addEventListener("DOMContentLoaded", () => {
+  setupConfiguredLinks();
   setupCookies();
   setupTheme();
   setupHeaderBehavior();
@@ -602,13 +534,13 @@ document.addEventListener("DOMContentLoaded", () => {
   setupPreviewCarousel();
   setupModal();
   setupShareModal();
-  setupPacksModal();
   setupDevModal();
   setupFaqModal();
   setupTermsModal();
   setupCommentsModal();
   setupWhatsAssistant();
   renderTestimonials();
+  initCoverCounters();
   startPurchaseNotifications();
   document.getElementById("year").textContent = new Date().getFullYear();
 });
@@ -741,7 +673,7 @@ function setupModal() {
     if (event.key === "Escape") {
       const pm = document.getElementById("photoModal"), sm = document.getElementById("shareModal");
       if (pm.classList.contains("is-open")) closeModal();
-      if (sm.classList.contains("is-open")) { sm.classList.remove("is-open"); sm.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }
+      if (sm.classList.contains("is-open")) setModalState(sm, false);
     }
   });
   document.getElementById("unlockAdult").addEventListener("click", () => modal.classList.add("is-unlocked"));
@@ -749,7 +681,7 @@ function setupModal() {
   document.getElementById("photoModalNext").addEventListener("click", () => openModal((modalIndex + 1) % PREVIEWS.length));
   document.getElementById("modalShare").addEventListener("click", () => {
     document.getElementById("shareUrlInput").value = window.location.href;
-    const sm = document.getElementById("shareModal"); sm.classList.add("is-open"); sm.setAttribute("aria-hidden", "false");
+    const sm = document.getElementById("shareModal"); setModalState(sm, true);
   });
 }
 
@@ -762,14 +694,14 @@ function openModal(index) {
   document.getElementById("modalTitle").textContent = item.title;
   document.getElementById("modalText").textContent = item.text;
   document.getElementById("modalWhats").href = whatsLink(item.title);
-  modal.classList.remove("is-unlocked"); modal.classList.add("is-open"); modal.setAttribute("aria-hidden", "false");
-  document.body.style.overflow = "hidden";
+  modal.classList.remove("is-unlocked");
+  setModalState(modal, true);
 }
 
 function closeModal() {
   const modal = document.getElementById("photoModal");
-  modal.classList.remove("is-open", "is-unlocked"); modal.setAttribute("aria-hidden", "true");
-  document.body.style.overflow = "";
+  modal.classList.remove("is-unlocked");
+  setModalState(modal, false);
 }
 
 // ═══ SHARE MODAL ═══
@@ -784,9 +716,9 @@ function setupShareModal() {
   ];
   grid.innerHTML = socialLinks.map(l => `<a href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`).join("");
   document.getElementById("sharePage").addEventListener("click", () => {
-    input.value = window.location.href; modal.classList.add("is-open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
+    input.value = window.location.href; setModalState(modal, true);
   });
-  document.querySelectorAll("[data-close-share]").forEach(el => el.addEventListener("click", () => { modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }));
+  document.querySelectorAll("[data-close-share]").forEach(el => el.addEventListener("click", () => setModalState(modal, false)));
   document.getElementById("shareCopyBtn").addEventListener("click", async () => {
     try { await navigator.clipboard.writeText(window.location.href); showToast("Link copiado! ✓"); } catch (_) { input.select(); showToast("Selecione e copie o link acima"); }
   });
@@ -812,20 +744,39 @@ function setupWhatsAssistant() {
 
   function loadChat() { try { const raw = localStorage.getItem(STORAGE_KEY); chatHistory = raw ? JSON.parse(raw) : []; } catch (_) { chatHistory = []; } }
 
+  function setMessageContent(element, text, time, showCursor = false) {
+    element.replaceChildren(document.createTextNode(text));
+    const meta = document.createElement("span");
+    meta.className = showCursor ? "cursor" : "time";
+    meta.textContent = showCursor ? "|" : time;
+    element.appendChild(meta);
+  }
+
+  function createChatCard(title, sub, link, time) {
+    const card = document.createElement("div");
+    card.className = "wa-msg card";
+    const heading = document.createElement("strong");
+    heading.textContent = title;
+    const description = document.createElement("small");
+    description.textContent = sub;
+    const timestamp = document.createElement("span");
+    timestamp.className = "time";
+    timestamp.textContent = time;
+    card.append(heading, description, timestamp);
+    if (link && link.startsWith("http")) card.addEventListener("click", () => window.open(link, "_blank", "noopener"));
+    return card;
+  }
+
   function renderHistory() {
-    body.innerHTML = "";
+    body.replaceChildren();
     chatHistory.forEach(m => {
       if (m.type === "msg") {
         const div = document.createElement("div");
         div.className = "wa-msg " + (m.cls || "ia");
-        div.innerHTML = (m.text || "") + `<span class="time">${m.time || ""}</span>`;
+        setMessageContent(div, m.text || "", m.time || "");
         body.appendChild(div);
       } else if (m.type === "card") {
-        const div = document.createElement("div");
-        div.className = "wa-msg card";
-        div.innerHTML = `<strong>${m.title}</strong><small>${m.sub}</small><span class="time">${m.time || ""}</span>`;
-        if (m.link) div.addEventListener("click", () => { if (m.link.startsWith("http")) window.open(m.link, "_blank"); });
-        body.appendChild(div);
+        body.appendChild(createChatCard(m.title || "", m.sub || "", m.link || "", m.time || ""));
       }
     });
     body.scrollTop = body.scrollHeight;
@@ -835,12 +786,13 @@ function setupWhatsAssistant() {
     const div = document.createElement("div");
     div.className = "wa-msg " + cls;
     if (cls === "ia") {
-      div.innerHTML = `<span class="cursor">|</span>`;
+      setMessageContent(div, "", "", true);
       body.appendChild(div); body.scrollTop = body.scrollHeight;
       let j = 0;
       function type() {
         if (j < text.length) {
-          div.innerHTML = text.slice(0, j + 1) + (j < text.length - 1 ? "<span class='cursor'>|</span>" : `<span class="time">${time || now()}</span>`);
+          const isTyping = j < text.length - 1;
+          setMessageContent(div, text.slice(0, j + 1), time || now(), isTyping);
           body.scrollTop = body.scrollHeight; j++;
           const char = text[j - 1] || "";
           const delay = ".!?".includes(char) ? 150 + Math.random() * 120 : (char === "," ? 80 + Math.random() * 50 : 15 + Math.random() * 18);
@@ -851,17 +803,14 @@ function setupWhatsAssistant() {
       }
       type();
     } else {
-      div.innerHTML = text + `<span class="time">${time || now()}</span>`;
+      setMessageContent(div, text, time || now());
       body.appendChild(div); body.scrollTop = body.scrollHeight;
       if (persist) { chatHistory.push({ type: "msg", text, cls, time: time || now() }); saveChat(); }
     }
   }
 
   function appendCard(title, sub, link, time, persist = true) {
-    const div = document.createElement("div");
-    div.className = "wa-msg card";
-    div.innerHTML = `<strong>${title}</strong><small>${sub}</small><span class="time">${time || now()}</span>`;
-    if (link) div.addEventListener("click", () => { if (link.startsWith("http")) window.open(link, "_blank"); });
+    const div = createChatCard(title, sub, link, time || now());
     body.appendChild(div); body.scrollTop = body.scrollHeight;
     if (persist) { chatHistory.push({ type: "card", title, sub, link, time: time || now() }); saveChat(); }
   }
@@ -878,11 +827,15 @@ function setupWhatsAssistant() {
 
   function renderOptions() {
     const pool = IA_OPTIONS_POOLS[Math.floor(Math.random() * IA_OPTIONS_POOLS.length)];
-    options.innerHTML = pool.map(label => {
+    options.replaceChildren(...pool.map(label => {
       const l = label.toLowerCase();
       const key = l.includes("pack") ? "packs" : l.includes("valor") || l.includes("custa") ? "valores" : l.includes("conteudo") || l.includes("foto") ? "conteudo" : l.includes("programa") || l.includes("encontro") ? "gp" : l.includes("privacidade") || l.includes("comprar") ? "privacidade" : l.includes("criou") || l.includes("site") ? "dev" : l.includes("falar") || l.includes("mauricio") ? "falar" : "previas";
-      return `<button data-wa="${key}">${label}</button>`;
-    }).join("");
+      const button = document.createElement("button");
+      button.type = "button";
+      button.dataset.wa = key;
+      button.textContent = label;
+      return button;
+    }));
     options.querySelectorAll("button").forEach(btn => {
       btn.addEventListener("click", () => { appendBubble(btn.textContent, "user"); handleTopic(btn.dataset.wa); btn.classList.add("used"); });
     });
@@ -917,42 +870,62 @@ function setupWhatsAssistant() {
   }
 
   /* Auto messages - balloon only when closed */
+  function scheduleNextAutoMessage() {
+    clearTimeout(waRepeatTimer);
+    waRepeatTimer = setTimeout(() => {
+      waRepeatTimer = null;
+      showNextAutoMessage();
+    }, randomAutoDelay());
+  }
+
   function showNextAutoMessage() {
-    if (chatOpen || assistant.classList.contains("is-visible")) return;
+    if (document.hidden || chatOpen || hasActiveInterruption()) {
+      scheduleNextAutoMessage();
+      return;
+    }
     const msg = WA_MESSAGES[waMessageIndex % WA_MESSAGES.length];
-    body.innerHTML = "";
+    body.replaceChildren();
     const div = document.createElement("div");
     div.className = "wa-msg auto";
-    div.innerHTML = msg.text + `<span class="time">${now()}</span>`;
+    setMessageContent(div, msg.text, now());
     body.appendChild(div);
-    options.innerHTML = "";
+    options.replaceChildren();
     const inputWrap = document.querySelector(".wa-chat-input");
     const floatWrap = document.querySelector(".wa-chat-float");
     if (inputWrap) inputWrap.style.display = "none";
     if (floatWrap) floatWrap.style.display = "none";
     assistant.classList.add("is-visible");
     waMessageIndex++;
-    waAutoHideTimer = setTimeout(() => { assistant.classList.remove("is-visible"); waRepeatTimer = setTimeout(showNextAutoMessage, 3 * 60 * 1000); }, 12000);
+    waAutoHideTimer = setTimeout(() => {
+      assistant.classList.remove("is-visible");
+      scheduleNextAutoMessage();
+    }, 12000);
   }
 
   /* Interactive */
-  document.querySelector(".whatsapp-float").addEventListener("click", e => {
-    e.preventDefault();
-    chatOpen = true;
-    assistant.classList.remove("is-visible");
-    clearTimeout(waAutoHideTimer); clearTimeout(waRepeatTimer);
-    setTimeout(() => {
-      body.innerHTML = "";
-      assistant.classList.add("is-visible");
-      document.querySelector(".wa-chat-input").style.display = "flex";
-      document.querySelector(".wa-chat-float").style.display = "";
-      loadChat();
-      chatHistory.length ? renderHistory() : appendBubble("Olá! Sou a Drew IA, assistente do Mauricio. Como posso ajudar?", "ia");
-      renderOptions();
-    }, 200);
+  document.querySelectorAll("[data-chat-trigger]").forEach(trigger => {
+    trigger.addEventListener("click", e => {
+      e.preventDefault();
+      chatOpen = true;
+      assistant.classList.remove("is-visible");
+      clearTimeout(waAutoHideTimer); clearTimeout(waRepeatTimer);
+      setTimeout(() => {
+        body.replaceChildren();
+        assistant.classList.add("is-visible");
+        document.querySelector(".wa-chat-input").style.display = "flex";
+        document.querySelector(".wa-chat-float").style.display = "";
+        loadChat();
+        chatHistory.length ? renderHistory() : appendBubble("Olá! Sou a Drew IA, assistente do Mauricio. Como posso ajudar?", "ia");
+        renderOptions();
+      }, 200);
+    });
   });
 
-  close.addEventListener("click", () => { chatOpen = false; assistant.classList.remove("is-visible"); waRepeatTimer = setTimeout(showNextAutoMessage, 2 * 60 * 1000); });
+  close.addEventListener("click", () => {
+    chatOpen = false;
+    assistant.classList.remove("is-visible");
+    scheduleNextAutoMessage();
+  });
 
   send.addEventListener("click", () => {
     const msg = input.value.trim(); if (!msg) return;
@@ -961,7 +934,7 @@ function setupWhatsAssistant() {
 
   input.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); send.click(); } });
 
-  setTimeout(showNextAutoMessage, 10000);
+  scheduleNextAutoMessage();
 }
 
 const IA_TOPICS = {
@@ -986,16 +959,52 @@ const IA_OPTIONS_POOLS = [
 ];
 
 // ═══ UTILITÁRIOS ═══
+function setupConfiguredLinks() {
+  document.querySelectorAll("[data-channel]").forEach(link => {
+    const channel = link.dataset.channel;
+    if (channel === "whatsapp") {
+      link.href = whatsappUrl(link.dataset.message || "");
+    } else if (APP[channel]) {
+      link.href = APP[channel];
+    }
+  });
+}
+
+function whatsappUrl(message = "") {
+  const query = message ? `?text=${encodeURIComponent(message)}` : "";
+  return `https://wa.me/${APP.whatsapp}${query}`;
+}
+
+function randomAutoDelay() {
+  return Math.floor(AUTO_DELAY_MIN + Math.random() * (AUTO_DELAY_MAX - AUTO_DELAY_MIN + 1));
+}
+
+function hasActiveInterruption() {
+  return Boolean(
+    document.querySelector(".purchase-notify") ||
+    document.querySelector(".wa-assistant.is-visible") ||
+    document.querySelector(".modal.is-open") ||
+    document.querySelector(".cookie-banner.is-visible")
+  );
+}
+
+function setModalState(modal, isOpen) {
+  if (!modal) return;
+  modal.classList.toggle("is-open", isOpen);
+  modal.setAttribute("aria-hidden", String(!isOpen));
+  document.body.style.overflow = document.querySelector(".modal.is-open") ? "hidden" : "";
+}
+
 function whatsLink(context) {
-  return `https://wa.me/${APP.whatsapp}?text=${encodeURIComponent(`Oi Mauricio, quero saber mais sobre ${context} e os packs de conteúdo.`)}`;
+  return whatsappUrl(`Oi Mauricio, quero saber mais sobre ${context} e os packs de conteúdo.`);
 }
 
 function showConfirm(text, onYes) {
   const modal = document.getElementById("confirmModal");
   document.getElementById("confirmText").textContent = text;
-  modal.classList.add("is-open"); modal.setAttribute("aria-hidden", "false");
+  setModalState(modal, true);
 
-  function close() { modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true"); }
+  function close() { setModalState(modal, false); }
 
   document.getElementById("confirmYes").onclick = () => { close(); onYes(); };
   document.getElementById("confirmNo").onclick = close;
