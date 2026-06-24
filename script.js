@@ -441,7 +441,7 @@ function setupCommentsModal() {
     document.getElementById("commentText").value = "";
     renderTestimonials();
     openCommentsModal(activeTestimonialId);
-    showToast("Comentário salvo neste dispositivo!");
+    showToast("Comentário enviado, obrigado!");
   });
   document.addEventListener("keydown", event => {
     if (event.key === "Escape" && modal.classList.contains("is-open")) setModalState(modal, false);
